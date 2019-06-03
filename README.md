@@ -20,5 +20,3 @@ Installing packages with requirements
 $ cd greeterguru && pip3 install -r requirements.txt
 ```
 
-## Testing
-We use CodeShip for Continuous Integration testing
