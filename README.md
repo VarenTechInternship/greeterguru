@@ -1,5 +1,5 @@
 # Greeter Guru
-
+[![CircleCI](https://circleci.com/gh/VarenTechInternship/greeterguru.svg?style=svg)](https://circleci.com/gh/VarenTechInternship/greeterguru)
 ## Schematics
 
 ![Schematics](schematics.png)
@@ -17,6 +17,5 @@ $ source env/bin/activate
 ```
 Installing packages with requirements
 ```bash
-$ cd greeterguru && pip3 install -r requirements.txt
+$ cd GreeterGuru && pip3 install -r requirements.txt
 ```
-
