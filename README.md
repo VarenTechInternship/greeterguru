@@ -17,5 +17,5 @@ $ source env/bin/activate
 ```
 Installing packages with requirements
 ```bash
-$ cd greeterguru && pip3 install -r requirements.txt
+$ cd GreeterGuru && pip3 install -r requirements.txt
 ```
