@@ -1,0 +1,54 @@
+Django 
+----------
+
+1. What are projects? What are apps?
+
+In Django, there is only ONE project. There can be many "apps" within it, but there is 
+ever only one project. 
+
+What do you think our project is this application?
+
+Apps on the other hand, are small libraries representing a discrete
+part of a larger project. For example, if we were to create a blog project, we might have an app
+to handle blog posts, and one to handle static pages, like an About page called pages, and another app 
+called payments to charge logged-in subsribers. 
+
+What do you think would be some good apps in Django?
+
+2. What are models? 
+
+We all know what an object is right? We know what a database is right?
+
+A model is a special type of object that can be stored in a database.
+Here's an example 
+
+User
+---------------
+name
+password
+to_string() -> String
+
+Employee(User)
+---------------
+department 
+role
+images[File of PNGs/ JPGs]
+is_current_employee() -> bool 
+get_bitmap()
+
+Connector
+------------------
+name
+api_key
+establish_connection()
+stop_connection()
+
+
+3. What are URLs?
+
+Each app has URLs that a user would be able to access via web browser.
+
+ As maintainers of the application, what sort of web pages would be a good idea?
+
+ 
+
