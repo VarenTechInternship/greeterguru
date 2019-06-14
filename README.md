@@ -22,18 +22,24 @@ $ cd GreeterGuru && pip3 install -r requirements.txt
 
 ## Directories Overview
 
-FaceID: Face detection and recognition package. Implements bulk of project's functionality.
+**FaceID:** Face detection and recognition package. Implements bulk of project's functionality.
 
-GGProject: Root directory of GreeterGuru Django project.
+--> **Datset:** Pictures of each employee.
 
-GreeterGuru: Django project package.
+--> **Cascade:** Reference file for face detection.
 
-main: Django application. Handles project workflow.
+--> **Trainer:** Results from training the model.
 
-api: Django application. Implements necessary APIs.
+**GGProject:** Root directory of GreeterGuru Django project.
 
-scripts: Additional python scripts for Django project.
+--> **GreeterGuru:** Django project package.
 
-.circleci: CircleCI directory. Used to automate testing.
+--> **workflow:** Django application. Handles project workflow.
 
-venv: Virtual environment.
+--> **api:** Django application. Implements necessary APIs.
+
+--> **scripts:** Additional python scripts for Django project.
+
+**.circleci:** CircleCI directory. Used to automate testing.
+
+**venv:** Virtual environment.
