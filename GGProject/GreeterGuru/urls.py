@@ -18,7 +18,7 @@ from django.urls import path, re_path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', admin.site.urls),
-    path('workflow/', include('workflow.urls')),
+    #re_path('', admin.site.urls),
+    #path('workflow/', include('workflow.urls')),
     re_path('api/(?P<version>(v1|v2))/', include('workflow.urls')),
 ]
