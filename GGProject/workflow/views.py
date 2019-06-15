@@ -12,9 +12,8 @@ class ListEmployeesView(generics.ListAPIView):
     
 '''    
 # Displays a selected Employee's attributes
-def SingleEmployeeView(generics.ListAPIView, pk):
-    
-    # Set of attributes to query
-    queryset = Employee.objects.get(pk=pk)
-    serializer_class = EmployeesSerializer
+def SingleEmployeeView(request, pk):
+
+    if request.method == 'GET':
+        serializer = EmployeesSerializer
 '''
