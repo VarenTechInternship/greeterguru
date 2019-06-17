@@ -13,16 +13,16 @@ class BaseViewTest(APITestCase):
 
     # Method for creating employees
     @staticmethod
-    def create_employee(first_name="", last_name="", primary_key=None, authen=None):
-        if first_name != "" and last_name != "" and  primary_key!=None and authen!=None:
-            Employee.objects.create(first_name=first_name, last_name=last_name, primary_key=primary_key, authen=authen)
+    def create_employee(first_name="", last_name="", emp_ID=None):
+        if first_name != "" and last_name != "" and  emp_ID != None:
+            Employee.objects.create(first_name=first_name, last_name=last_name, emp_ID=emp_ID)
 
     # Initialize four employees
     def setUp(self):
-        self.create_employee("kendall", "kempton", 565, 0)
-        self.create_employee("jay", "hall", 560, 0)
-        self.create_employee("caroline", "orndorff", 335, 0)
-        self.create_employee("will", "parks", 104, 1)
+        self.create_employee("kendall", "kempton", 565)
+        self.create_employee("jay", "hall", 560)
+        self.create_employee("caroline", "orndorff", 335)
+        self.create_employee("will", "parks", 104)
 
 
 

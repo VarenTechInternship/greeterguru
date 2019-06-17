@@ -5,4 +5,10 @@ from .models import Employee
 class EmployeesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ("first_name", "last_name", "primary_key", "authen")
+        fields = ("first_name", "last_name", "emp_ID")
+
+# Serializer for the employee class
+#class EmployeesSerializer(serializers.ModelSerializer):
+#    class Meta:
+#        model = Employee
+#        fields = ("first_name", "last_name", "primary_key", "authen")
