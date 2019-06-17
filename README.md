@@ -17,7 +17,12 @@ $ source env/bin/activate
 ```
 Installing packages with requirements
 ```bash
-$ cd GreeterGuru && pip3 install -r requirements.txt
+$ pip3 install -r requirements.txt
+```
+
+## Running the Application
+```bash
+$ cd GGProject && python3 manage.py runserver
 ```
 
 ## Directories Overview
