@@ -17,7 +17,7 @@ authen = (AllowAny,)
 class ListEmployees(APIView):
 
     permission_classes = authen
-    
+
     # Return all employee information
     def get(self, request, format=None):
         employees = Employee.objects.all()
@@ -31,8 +31,8 @@ class ListEmployees(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-    
-    
+
+
 # API for handling a single employee based on their employee ID
 class SingleEmployee(APIView):
 
@@ -44,7 +44,7 @@ class SingleEmployee(APIView):
             return Employee.objects.get(emp_ID=emp_ID)
         except Employee.DoesNotExist:
             raise Http404
-    
+
     # Return retrieved employee
     def get(self, request, emp_ID, format=None):
         employee = self.get_employee(emp_ID)
@@ -59,13 +59,13 @@ class SingleEmployee(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
     # Delete retrieved employee
     def delete(self, request, emp_ID, format=None):
         employee = self.get_employee(emp_ID)
         employee.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
 
 # API for handling all pictures
 class ListPictures(APIView):
@@ -78,11 +78,11 @@ class ListPictures(APIView):
         serializer = PicturesSerializer(pictures, many=True)
         return Response(serializer.data)
 
-    
+
 # API for handling pictures based on employee ID of the employee they belong to
 class EmployeePictures(APIView):
 
-    permission_classes = authen   
+    permission_classes = authen
 
     # Retrieve employee according to passed employee ID
     def get_employee(self, emp_ID):
@@ -90,11 +90,11 @@ class EmployeePictures(APIView):
             return Employee.objects.get(emp_ID=emp_ID)
         except Employee.DoesNotExist:
             raise Http404
-    
+
     # Return retrieved pictures
     def get(self, request, emp_ID):
         employee = self.get_employee(emp_ID)
-        pictures = Picture.objects.all().filter(employee=employee)        
+        pictures = Picture.objects.all().filter(employee=employee)
         serializer = PicturesSerializer(pictures, many=True)
         return Response(serializer.data)
 
@@ -102,21 +102,21 @@ class EmployeePictures(APIView):
     def post(self, request, emp_ID):
         employee = self.get_employee(emp_ID)
         serializer = PicturesSerializer(data={})
-        
         if serializer.is_valid():
             # Add all necessary attributes
             serializer.validated_data["employee"] = employee
             serializer.validated_data["picture"] = request.FILES['file']
-            serializer.validated_data["name"] = request.FILES['file'].name[:-4]
+            pic_name = request.FILES['file'].name.split(".")[0]
+            serializer.validated_data["name"] = pic_name
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
-# API for handling a single picture based on its name   
+
+# API for handling a single picture based on its name
 class SinglePicture(APIView):
 
-    permission_classes = authen   
+    permission_classes = authen
 
     # Retrieve picture according to passed name
     def get_picture(self, name):
@@ -124,7 +124,7 @@ class SinglePicture(APIView):
             return Picture.objects.get(name=name)
         except Picture.DoesNotExist:
             raise Http404
-    
+
     # Return picture information
     def get(self, request, name):
         picture = self.get_picture(name)
@@ -139,7 +139,7 @@ class SinglePicture(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     # Delete retrieved picture
     def delete(self, request, name):
         picture = self.get_picture(name)
@@ -147,12 +147,12 @@ class SinglePicture(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-    
-# API for handling all temporary photos   
+
+# API for handling all temporary photos
 class ListTempPhotos(APIView):
 
     permission_classes = authen
-    
+
     # Return all temporary photos
     def get(self, request):
         tempPhotos = TempPhoto.objects.all()
@@ -165,7 +165,8 @@ class ListTempPhotos(APIView):
         if serializer.is_valid():
             # Add all necessary attributes
             serializer.validated_data["unknown_photo"] = request.FILES['file']
-            serializer.validated_data["name"] = request.FILES['file'].name[:-4]
+            pic_name = request.FILES['file'].name.split(".")[0]
+            serializer.validated_data["name"] = pic_name
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

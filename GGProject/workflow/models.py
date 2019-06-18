@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
 
+
 # Registered employee
 class Employee(models.Model):
 
@@ -61,6 +62,7 @@ class Employee(models.Model):
     )
 
     # Date of the last time the employee logged in
+    #format = 'YYYY-MM-DD'
     last_login = models.DateField(
         null = True,
         verbose_name = "Last login date"
@@ -69,8 +71,6 @@ class Employee(models.Model):
     # Printing an employee outputs their first and last name
     def __str__(self):
         return("{} {}".format(self.first_name, self.last_name))
-
-
 
 # Pictures that belong to an employee
 class Picture(models.Model):
@@ -129,7 +129,7 @@ class TempPhoto(models.Model):
         return("{}".format(self.name))
 
 
-    
+
 # Automatically generate authentication token for every user
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
