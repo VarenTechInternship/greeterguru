@@ -13,8 +13,8 @@ class Employee(models.Model):
         return("{} {}".format(self.first_name, self.last_name))
 
 class Picture(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE,)
-    picture = models.ImageField(upload_to="dataset/", null=True)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
+    picture = models.ImageField(null=True)
     
     def filename(self):
         return os.path.basename(self.picture.name)

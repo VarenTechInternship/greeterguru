@@ -14,20 +14,20 @@ def ListEmployees(request):
         serializer = EmployeesSerializer(employees, many=True)
         return Response(serializer.data)
 
-    if request.method == 'POST':
+    elif request.method == 'POST':
         serializer = EmployeesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=statis.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-
+    
     
 # API for handling a single employee based on their primary key
 @api_view(['GET', 'POST', 'DELETE'])
-def SingleEmployee(request, pk):
+def SingleEmployee(request, varen_ID):
 
     try:
-        employee = Employee.objects.get(pk=pk)
+        employee = Employee.objects.all().filter(varen_ID=varen_ID)
     except Employee.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -35,9 +35,13 @@ def SingleEmployee(request, pk):
         serializer = EmployeesSerializer(employee)
         return Response(serializer.data)
 
+    elif request.method == 'DELETE':
+        employee.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
     
 # API for handling all pictures    
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def ListPictures(request):
 
     if request.method == 'GET':
@@ -45,13 +49,20 @@ def ListPictures(request):
         serializer = PicturesSerializer(pictures, many=True)
         return Response(serializer.data)
 
+    elif request.method == 'POST':
+        serializer = PicturesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
-# API for handling pictures based on primary key of the employee they belong to
+# API for retrieving pictures based on varen ID of the employee they belong to
 @api_view(['GET', 'POST', 'DELETE'])
-def SinglePicture(request, pk):
+def EmployeePictures(request, varen_ID):
     
     try:
-        employee = Employee.objects.get(pk=pk)
+        employee = Employee.objects.get(varen_ID=varen_ID)
     except Employee.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -61,5 +72,12 @@ def SinglePicture(request, pk):
         serializer = PicturesSerializer(pictures, many=True)
         return Response(serializer.data)
 
-    #if request.method == 'POST':
-        # Deter
+    elif request.method == 'POST':
+        #serializer = PicturesSerializer(data=request.data)
+        serializer = PicturesSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.validated_data["employee"] = employee
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
