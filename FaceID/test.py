@@ -4,6 +4,7 @@ from django.core.files import File
 
 # Create authentication header containing admin token
 def authenticate():
+
     # Set admin information
     username = "admin"
     password = getpass.getpass(prompt="Admin Password: ")
@@ -23,6 +24,7 @@ def authenticate():
 
 # Retrieve and display all employees
 def display_employees():
+
     # Retrieve all employees
     response = requests.get("http://localhost:8000/api/employees/")
     content = response.json()
@@ -38,6 +40,7 @@ def display_employees():
 
 # Add employee object to database
 def create_employee():
+
     # Define employee data
     data = {
         "first_name": "Jaylan",
@@ -47,6 +50,7 @@ def create_employee():
         "manage_email": "parksw@varentech.com",
         "keycode": 12345,
         "emp_permissions": '1',
+        "last_login":"2019-06-26",
     }
 
     # Attempt to create employee object
@@ -55,7 +59,7 @@ def create_employee():
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print(err)
-        
+
     return response
 
 
@@ -68,10 +72,17 @@ def verify(response):
 
 
 def main():
-    
-   create_employee()
-   verify()
-   display_employees()
 
-    
+    #response = create_employee()
+    #verify(response)
+    display_employees()
+
+    pic_name = "500_0.jpg"
+    files = {"file" : open(pic_name, 'rb')}
+    try:
+        response = requests.post("http://localhost:8000/api/pictures/500/", files=files)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(err)
+
 main()
