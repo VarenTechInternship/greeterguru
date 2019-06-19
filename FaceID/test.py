@@ -12,23 +12,30 @@ def main():
         print()
 
 
-    #emp = requests.get("http://localhost:8000/api/employees/300")
+    #emp = requests.get("http://localhost:8000/api/employees/300/")
     #emp = emp.json()
 
-
+    """
     task = {"picture": "cat.jpg"}
-    response = requests.post("http://localhost:8000/api/pictures/300")
+    response = requests.delete("http://localhost:8000/api/pictures/User1_1.jpg/")
+
     content = response.json()
 
-    """
     for person in content:
         for key in person:
             print(key + ":", person[key])
         print()
-    """   
-        
-    #task = {"first_name": "Jaylan", "last_name": "Hall", "varen_ID": 400}
-    #response = requests.delete("http://localhost:8000/api/employees/")
+    """
+    
+    task = {
+        "first_name": "Jaylan",
+        "last_name": "Hall",
+        "email": "hallj@varentech.com",
+        "varen_ID": 400,
+        "keycode": 12345,
+    }
+
+    response = requests.post("http://localhost:8000/api/employees/", json=task)
     if response:
         print("Success!")
     else:

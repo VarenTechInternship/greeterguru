@@ -11,4 +11,4 @@ class EmployeesSerializer(serializers.ModelSerializer):
 class PicturesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Picture
-        fields = ("employee", "picture")
+        fields = ("employee", "picture", "name")
