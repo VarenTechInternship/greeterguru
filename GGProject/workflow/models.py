@@ -4,11 +4,70 @@ from django.db import models
 
 # Create your models here.
 class Employee(models.Model):
-    first_name = models.CharField(max_length=30)
+    #includes first_name, last_name, emp_ID, emp_email, emp_permissions, manager_email, key_code
+    first_name = models.CharField(max_length=30, primary_key = True)
     last_name = models.CharField(max_length=30)
-    emp_ID = models.IntegerField(default=0)
-    
+    emp_ID = models.ForeignKey(Photo, on_delete = models.CASCADE, related_name = 'person', default=0)
+
     def __str__(self):
         return("{} {}".format(self.first_name, self.last_name))
 
+    emp_email = models.EmailField(max_length = 254)
+    permissions_choices = ( #configures roles for different types of employees
+        # 0 can never unlock door
+        # 1 can unlock the door given the alarm is off
+        # 2 can always unlock the door
+        (0:"Never"),
+        (1:"Sometimes"),
+        (2:"Always"),
+    )
+    emp_permissions = models.CharField(
+        max_length = 15,
+        choices = permissions_choices,
+        default = 0
+    )
+    #Manager Information
+    manager_email = models.EmailField(max_length = 254)
+    #used only for two-factor authentication
+    key_code = models.PositiveSmallIntegerField(
+        max_length = 5,
+        validators = [
+            MaxValueValidator(65000)
+        ],
+        )
+    last_entry = models.DateTimeField()
+
 #class Admin(models.Model):
+class Admin(models.Model):
+    #includes admin_id, admin_email, admin_permissions, is_two_factor
+    admin_id = models.IntegerField(max_length = 30, primary_key = True)
+    admin_email = models.EmailField(max_length = 254)
+    admin_permissions_choices = (
+        (0:"User"),
+        (1:"Superuser"),
+        (3: "Superadmin"),
+    )
+    admin_permissions = models.CharField(
+        max_length = 15,
+        choices = admin_permissions_choices,
+        default = 0
+    )
+    is_two_factor = Models.BooleanField("Two-Factor Authentication", default = False)
+
+
+# store pictures
+class Photo(models.Model):
+    photo_tag = models.AutoIncrement(primary_key = True)
+    photo_id = models.AutoField(max_length = 10)
+    badge_photo = models.ImageField()
+    #sets name of photo file
+    def user_directory_path(instance, filename):
+        return 'user_{0}/{1}'.format(instance.Employee.emp_ID, photo_tag)
+    photos = models.FileField(upload_to = user_directory_path)
+    #sends photos to MEDIA_ROOT set in GreeterGuru/GGProject/GreeterGuru/settings.py
+class Temp_Photo(models.Model):
+    temp_id = models.AutoIncrement(max_length = 100, primary_key = True)
+    def temp_path(instance, filename):
+        return 'temp/{0}'.format(self.temp_id)
+    unknown_photo = models.FileField(upload_to = temp_path)
+    #sends photos to MEDIA_ROOT set in GreeterGuru/GGProject/GreeterGuru/settings.py
