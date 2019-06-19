@@ -24,13 +24,13 @@ def ListEmployees(request):
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
     
     
-# API for handling a single employee based on their Varen ID
+# API for handling a single employee based on their employee ID
 @api_view(['GET', 'PUT', 'DELETE'])
-def SingleEmployee(request, varen_ID):
+def SingleEmployee(request, emp_ID):
 
-    # Retrieve employee according to passed Varen ID
+    # Retrieve employee according to passed employee ID
     try:
-        employee = Employee.objects.get(varen_ID=varen_ID)
+        employee = Employee.objects.get(emp_ID=emp_ID)
     except Employee.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -94,13 +94,13 @@ def SinglePicture(request, name):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     
-# API for handling pictures based on varen ID of the employee they belong to
+# API for handling pictures based on employee ID of the employee they belong to
 @api_view(['GET', 'POST'])
-def EmployeePictures(request, varen_ID):
+def EmployeePictures(request, emp_ID):
 
-    # Retrieve employee based on passed Varen ID
+    # Retrieve employee based on passed employee ID
     try:
-        employee = Employee.objects.get(varen_ID=varen_ID)
+        employee = Employee.objects.get(emp_ID=emp_ID)
     except Employee.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 

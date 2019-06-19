@@ -6,7 +6,7 @@ class Employee(models.Model):
     first_name = models.CharField(null=True, max_length=30)
     last_name = models.CharField(null=True, max_length=30)
     email = models.EmailField(null=True)
-    varen_ID = models.IntegerField(null=True, unique=True, default=0)
+    emp_ID = models.IntegerField(null=True, unique=True, default=0, verbose_name="Employee ID")
     keycode = models.IntegerField(null=True, default=0)
 
     def __str__(self):

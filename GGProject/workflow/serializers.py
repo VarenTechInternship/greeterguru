@@ -5,7 +5,7 @@ from .models import Employee, Picture
 class EmployeesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ("first_name", "last_name", "email", "varen_ID", "keycode")
+        fields = ("first_name", "last_name", "email", "emp_ID", "keycode")
 
 # Serializer for the Picture class
 class PicturesSerializer(serializers.ModelSerializer):
