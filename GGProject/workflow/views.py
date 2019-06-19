@@ -25,7 +25,7 @@ def ListEmployees(request):
     
     
 # API for handling a single employee based on their Varen ID
-@api_view(['GET', 'DELETE'])
+@api_view(['GET', 'PUT', 'DELETE'])
 def SingleEmployee(request, varen_ID):
 
     # Retrieve employee according to passed Varen ID
@@ -39,6 +39,14 @@ def SingleEmployee(request, varen_ID):
         serializer = EmployeesSerializer(employee)
         return Response(serializer.data)
 
+    # Update the retrieved employee
+    elif request.method == 'PUT':
+        serializer = EmployeesSerializer(employee, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
     # Delete retrieved employee
     elif request.method == 'DELETE':
         employee.delete()
@@ -58,7 +66,7 @@ def ListPictures(request):
 
     
 # API for handling a single picture based on its name   
-@api_view(['GET', 'DELETE'])
+@api_view(['GET', 'PUT', 'DELETE'])
 def SinglePicture(request, name):
 
     # Retrieve picture based on based name
@@ -72,6 +80,14 @@ def SinglePicture(request, name):
         serializer = PicturesSerializer(picture)
         return Response(serializer.data)
 
+    # Update retrieved picture
+    elif request.method == 'PUT':
+        serializer = PicturesSerializer(picture, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     # Delete retrieved picture
     elif request.method == 'DELETE':
         picture.delete()

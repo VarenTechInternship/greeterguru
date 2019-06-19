@@ -28,14 +28,14 @@ def main():
     """
     
     task = {
-        "first_name": "Jaylan",
-        "last_name": "Hall",
+#        "first_name": "Jaylan",
+#        "last_name": "Hall",
         "email": "hallj@varentech.com",
         "varen_ID": 400,
         "keycode": 12345,
     }
 
-    response = requests.post("http://localhost:8000/api/employees/", json=task)
+    response = requests.put("http://localhost:8000/api/employees/450/", json=task)
     if response:
         print("Success!")
     else:
