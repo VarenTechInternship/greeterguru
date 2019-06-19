@@ -65,35 +65,6 @@ def ListPictures(request):
         return Response(serializer.data)
 
     
-# API for handling a single picture based on its name   
-@api_view(['GET', 'PUT', 'DELETE'])
-def SinglePicture(request, name):
-
-    # Retrieve picture based on based name
-    try:
-        picture = Picture.objects.get(name=name)
-    except Picture.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    # Return retrieved picture
-    if request.method == 'GET':
-        serializer = PicturesSerializer(picture)
-        return Response(serializer.data)
-
-    # Update retrieved picture
-    elif request.method == 'PUT':
-        serializer = PicturesSerializer(picture, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Delete retrieved picture
-    elif request.method == 'DELETE':
-        picture.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    
 # API for handling pictures based on employee ID of the employee they belong to
 @api_view(['GET', 'POST'])
 def EmployeePictures(request, emp_ID):
@@ -121,3 +92,32 @@ def EmployeePictures(request, emp_ID):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
+# API for handling a single picture based on its name   
+@api_view(['GET', 'PUT', 'DELETE'])
+def SinglePicture(request, name):
+
+    # Retrieve picture based on based name
+    try:
+        picture = Picture.objects.get(name=name)
+    except Picture.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # Return retrieved picture
+    if request.method == 'GET':
+        serializer = PicturesSerializer(picture)
+        return Response(serializer.data)
+
+    # Update retrieved picture
+    elif request.method == 'PUT':
+        serializer = PicturesSerializer(picture, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Delete retrieved picture
+    elif request.method == 'DELETE':
+        picture.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

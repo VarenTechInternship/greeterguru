@@ -6,7 +6,7 @@ class Employee(models.Model):
     first_name = models.CharField(null=True, max_length=30)
     last_name = models.CharField(null=True, max_length=30)
     email = models.EmailField(null=True)
-    emp_ID = models.IntegerField(null=True, unique=True, default=0, verbose_name="Employee ID")
+    emp_ID = models.IntegerField(null=True, unique=True, verbose_name="Employee ID")
     keycode = models.IntegerField(null=True, default=0)
 
     def __str__(self):
@@ -18,4 +18,4 @@ class Picture(models.Model):
     name = models.CharField(null=True, unique=True, max_length=30)
     
     def __str__(self):
-        return("{}".format(self.picture.name))
+        return("{}".format(self.name))
