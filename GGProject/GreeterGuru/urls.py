@@ -15,13 +15,22 @@ Including another URLconf
 """
 
 from django.contrib import admin
+<<<<<<< HEAD
 from django.urls import path, include, re_path
+=======
+from django.urls import path, include
+>>>>>>> 2d7eba7... Add Django-Admin-Tools
 from django.conf.urls import url
 
 admin.autodiscover()
 
 urlpatterns = [
+<<<<<<< HEAD
     path('', admin.site.urls),
     url(r'^admin_tools/', include('admin_tools.urls')),
     re_path('api/', include('workflow.urls')),
+=======
+    path('admin/', admin.site.urls),
+    url(r'^admin_tools/', include('admin_tools.urls')),
+>>>>>>> 2d7eba7... Add Django-Admin-Tools
 ]
