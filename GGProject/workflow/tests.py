@@ -8,21 +8,22 @@ from .serializers import EmployeesSerializer
 
 # Creates API test case
 class BaseViewTest(APITestCase):
-    
+
     client = APIClient()
 
     # Method for creating employees
     @staticmethod
-    def create_employee(first_name="", last_name="", emp_ID=None):
-        if first_name != "" and last_name != "" and  emp_ID != None:
-            Employee.objects.create(first_name=first_name, last_name=last_name, emp_ID=emp_ID)
+    def create_employee(first_name="", last_name="", emp_ID=None, emp_email = "", emp_permissions =None, manager_email = "", key_code = None):
+        if first_name != "" and last_name != "" and  emp_ID != None and emp_permissions != None, and manager_email != "" and key_code != None:
+            Employee.objects.create(first_name=first_name, last_name=last_name, emp_ID=emp_ID, emp_email = emp_email, emp_permissions = emp_permissions, manager_email = manager_email, key_code = key_code)
 
-    # Initialize four employees
+
+    # Initialize four employees & two admins
     def setUp(self):
-        self.create_employee("kendall", "kempton", 565)
-        self.create_employee("jay", "hall", 560)
-        self.create_employee("caroline", "orndorff", 335)
-        self.create_employee("will", "parks", 104)
+        self.create_employee("kendall", "kempton", 565, "kemptonk@varentech.com", 2, "orndorffc@varentech.com", 12345)
+        self.create_employee("jay", "hall", 560, "hallj@varentech.com", 2, "orndorffc@varentech.com", 12345)
+        self.create_employee("caroline", "orndorff", 335, "orndorffc@varentech.com", 2, "orndorffc@varentech.com", 12345)
+        self.create_employee("will", "parks", 104, "parksw@varentech.com", 2, "orndorffc@varentech.com", 12345)
 
 
 
