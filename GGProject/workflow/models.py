@@ -18,4 +18,4 @@ class Picture(models.Model):
     name = models.CharField(null=True, unique=True, max_length=30)
     
     def __str__(self):
-        return("{}".format(self.picture.name))
+        return("{}".format(self.name))

@@ -3,6 +3,7 @@ import json
 from getpass import getpass
 
 def main():
+    # Retrieve all employees and display their information
     response = requests.get("http://localhost:8000/api/employees/")
     content = response.json()
 
@@ -12,16 +13,14 @@ def main():
         print()
 
 
-    #emp = requests.get("http://localhost:8000/api/employees/300/")
-    #emp = emp.json()
-
-
-    task = {"picture": "cat.jpg", "name": "cat.jpg"}
-    response = requests.post("http://localhost:8000/api/pictures/400/")
-
-    #content = response.json()
+    # Attempt to post an image to the database
+    # (Requires employee with emp_ID 400 to exist)
+    pic = open("cat.jpg", "r")
+    task = {"picture": pic, "name": "cat"}
+    response = requests.post("http://localhost:8000/api/pictures/400/", json=task)
 
     """
+    # Create employee object
     for person in content:
         for key in person:
             print(key + ":", person[key])
@@ -36,11 +35,13 @@ def main():
         "keycode": 12345,
     }
 
-    response = requests.put("http://localhost:8000/api/employees/450/", json=task)
+    response = requests.post("http://localhost:8000/api/employees/", json=task)
     """
+
+    # Verify whether the request was successful
     if response:
-        print("Success!")
+        print("SUCCESS!")
     else:
-        print("Whoops.")
+        print("whoops...")
     
 main()
