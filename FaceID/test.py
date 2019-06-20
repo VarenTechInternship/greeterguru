@@ -1,6 +1,5 @@
-import requests
-import json
-from getpass import getpass
+import requests, json
+from django.core.files import File
 
 def main():
     # Retrieve all employees and display their information
@@ -15,12 +14,9 @@ def main():
 
     # Attempt to post an image to the database
     # (Requires employee with emp_ID 400 to exist)
-    """
-    pic = open("cat.jpg", "r")
-    task = {"picture": pic, "name": "cat"}
-    response = requests.post("http://localhost:8000/api/pictures/400/", json=task)
-    """
-
+    files = {"file" : open('cat.jpg', 'rb')}
+    response = requests.post("http://localhost:8000/api/pictures/400/", files=files)
+    
     """
     # Create employee object
     for person in content:

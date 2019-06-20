@@ -87,10 +87,12 @@ def EmployeePictures(request, emp_ID):
 
     # Create new picture belonging to retrieved employee
     elif request.method == 'POST':
-        serializer = PicturesSerializer(data=request.data)
+        serializer = PicturesSerializer(data={})
+    
         if serializer.is_valid():
             serializer.validated_data["employee"] = employee
-            serializer.validated_data["picture"] = request.FILES['pic']
+            serializer.validated_data["picture"] = request.FILES['file']
+            serializer.validated_data["name"] = request.FILES['file'].name[:-4]
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
