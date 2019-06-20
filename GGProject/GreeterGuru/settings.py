@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'workflow',
+    'django_popup_view_field',
 ]
 
 MIDDLEWARE = [
