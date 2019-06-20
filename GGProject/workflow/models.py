@@ -14,7 +14,7 @@ class Employee(models.Model):
 
 class Picture(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
-    picture = models.ImageField(null=True)
+    picture = models.ImageField(upload_to="Dataset/", null=True)
     name = models.CharField(null=True, max_length=30, unique=True)
     
     def __str__(self):

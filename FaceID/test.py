@@ -19,13 +19,7 @@ def main():
     
     """
     # Create employee object
-    for person in content:
-        for key in person:
-            print(key + ":", person[key])
-        print()
-    """
-    """   
-    task = {
+    data = {
         "first_name": "Jaylan",
         "last_name": "Hall",
         "email": "hallj@varentech.com",
@@ -33,9 +27,9 @@ def main():
         "keycode": 12345,
     }
 
-    response = requests.post("http://localhost:8000/api/employees/", json=task)
+    response = requests.post("http://localhost:8000/api/employees/", json=data)
     """
-
+    
     # Verify whether the request was successful
     if response:
         print("SUCCESS!")

@@ -4,7 +4,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Employee, Picture
 from .serializers import EmployeesSerializer, PicturesSerializer
-from .forms import PictureForm
 
 
 # API for handling all employees
