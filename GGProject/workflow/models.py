@@ -33,30 +33,14 @@ class Picture(models.Model):
     
     def __str__(self):
         return("{}".format(self.name))
-    
-
-class Admin(models.Model):
-    #includes admin_id, admin_email, admin_permissions, is_two_factor
-    admin_id = models.IntegerField(primary_key = True)
-    admin_email = models.EmailField(max_length = 254, default = "")
-    admin_permissions_choices = [
-        (0,'User'),
-        (1,'Superuser'),
-        (2,'Superadmin'),
-    ]
-    admin_permissions = models.CharField(
-        max_length = 15,
-        choices = admin_permissions_choices,
-        default = 0
-    )
-    is_two_factor = models.BooleanField("Two-Factor Authentication", default = False)
-
 
 
     
 #Save unknown photos
 class Temp_Photo(models.Model):
     temp_id = models.AutoField(max_length = 100, primary_key = True)
+    picture = models.ImageField(null=True)
+    
     def temp_path(instance, filename):
         return 'temp/{0}'.format(self.temp_id)
     unknown_photo = models.FileField(upload_to = temp_path)
