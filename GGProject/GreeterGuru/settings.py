@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'workflow',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +57,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'GreeterGuru.urls'
+
+#configure custom admin page scripts
+ADMIN_TOOLS_INDEX_DASHBOARD = 'dashboard.CustomIndexDashboard'
+ADMIN_TOOLS_APP_INDEX_DASHBOARD = 'dashboard.CustomAppIndexDashboard'
+ADMIN_TOOLS_MENU = 'menu.CustomMenu'
 
 TEMPLATES = [
     {
@@ -92,7 +98,9 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
+TEMPLATE_DIRS = [
+    'GreeterGuru/GGProject/GreeterGuru/templates'
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
