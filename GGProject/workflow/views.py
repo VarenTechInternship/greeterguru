@@ -1,8 +1,10 @@
+from django.db import models
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Employee, Picture
 from .serializers import EmployeesSerializer, PicturesSerializer
+from .forms import PictureForm
 
 
 # API for handling all employees
@@ -86,14 +88,14 @@ def EmployeePictures(request, emp_ID):
     # Create new picture belonging to retrieved employee
     elif request.method == 'POST':
         serializer = PicturesSerializer(data=request.data)
-        
         if serializer.is_valid():
             serializer.validated_data["employee"] = employee
+            serializer.validated_data["picture"] = request.FILES['pic']
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     
+
 # API for handling a single picture based on its name   
 @api_view(['GET', 'PUT', 'DELETE'])
 def SinglePicture(request, name):
