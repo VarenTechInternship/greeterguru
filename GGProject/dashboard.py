@@ -68,20 +68,19 @@ class CustomIndexDashboard(Dashboard):
             _('Support'),
             children=[
                 {
-                    'title': _('Django documentation'),
-                    'url': 'http://docs.djangoproject.com/',
-                    'external': True,
+                    'title': _('Update Employees'),
+                    'url': 'AD/',
+                    'external': False,
+                    'description': "Update from Varen's Active Directory Account.",
+
                 },
                 {
-                    'title': _('Django "django-users" mailing list'),
-                    'url': 'http://groups.google.com/group/django-users',
-                    'external': True,
+                    'title': _('Authentication Options'),
+                    'url': 'authfactor/',
+                    'external': False,
+                    'description': 'Get Multi-Factor Authentication Options.'
                 },
-                {
-                    'title': _('Django irc channel'),
-                    'url': 'irc://irc.freenode.net/django',
-                    'external': True,
-                },
+
             ]
         ))
 
