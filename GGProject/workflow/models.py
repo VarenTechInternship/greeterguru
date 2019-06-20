@@ -12,7 +12,7 @@ class Employee(models.Model):
     def __str__(self):
         return("{} {}".format(self.first_name, self.last_name))
 
-    emp_email = models.EmailField(max_length = 254, default = "")
+    emp_email = models.EmailField(max_length = 254, blank = True)
     permissions_choices = [ #configures roles for different types of employees
         # 0 can never unlock door
         # 1 can unlock the door given the alarm is off
@@ -51,10 +51,12 @@ class Admin(models.Model):
 #Save recognized photos
 class Photo(models.Model):
     photo_id = models.ForeignKey(Employee, on_delete = models.CASCADE, related_name = "+")
+    def __str__(self):
+        return("{}".format(self.photo_id))
     badge_photo = models.ImageField()
     #sets name of photo file
     def user_directory_path(instance, filename):
-        return 'user_{0}/{1}'.format(instance.Employee.emp_ID, photo_id)
+        return '{0}_{1}'.format(instance.Employee.emp_ID, photo_id)
     photos = models.FileField(upload_to = user_directory_path)
     #sends photos to MEDIA_ROOT set in GreeterGuru/GGProject/GreeterGuru/settings.py
 
