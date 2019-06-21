@@ -55,6 +55,12 @@ class Employee(models.Model):
         verbose_name="Employee permissions"
     )
 
+    # Date of the last time the employee logged in
+    login_time = models.DateField(
+        null=True,
+        verbose_name="Last login date"
+    )
+
     # Printing an employee outputs their first and last name
     def __str__(self):
         return("{} {}".format(self.first_name, self.last_name))
