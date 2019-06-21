@@ -2,10 +2,10 @@ from django.db import models
 
 # A registered employee
 class Employee(models.Model):
-    first_name = models.CharField(max_length=30, primary_key = True)
-    last_name = models.CharField(max_length=30)
-    emp_ID = models.IntegerField(default=0)
-    emp_email = models.EmailField(max_length = 254, blank = True)
+    first_name = models.CharField(null=True, max_length=30)
+    last_name = models.CharField(null=True, max_length=30)
+    emp_ID = models.IntegerField(null=True, verbose_name="Employee ID")
+    emp_email = models.EmailField(null=True, max_length = 254, verbose_name="Employee Email")
     keycode = models.PositiveSmallIntegerField(default = 0)
     manager_email = models.EmailField(max_length = 254, default = "")
     
@@ -36,10 +36,10 @@ class Picture(models.Model):
 
 
 # Save unknown photos
-class Temp_Photo(models.Model):
+class TempPhoto(models.Model):
     temp_id = models.AutoField(max_length = 100, primary_key = True)
-    picture = models.ImageField(upload_to="Temp Photos/", null=True)
+    unknown_photo = models.ImageField(upload_to="Temp Photos/", null=True)
     name = models.CharField(null=True, unique=True, max_length=30)
     
     def __str__(self):
-        return("{}".format(self.name))    
+        return("{}".format(self.name))
