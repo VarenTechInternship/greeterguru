@@ -1,6 +1,6 @@
 from django.db import models
 
-# Employee
+# A registered employee
 class Employee(models.Model):
     first_name = models.CharField(max_length=30, primary_key = True)
     last_name = models.CharField(max_length=30)
