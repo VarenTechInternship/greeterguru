@@ -1,1 +1,0 @@
-# Implement serializers for APIs
