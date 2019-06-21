@@ -6,7 +6,7 @@ class EmployeesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ("first_name", "last_name", "emp_ID", "emp_email",
-                  "keycode", "manager_email", "emp_permissions")
+                  "manager_email", "keycode", "emp_permissions")
 
 # Serializer for the picture class
 class PicturesSerializer(serializers.ModelSerializer):
