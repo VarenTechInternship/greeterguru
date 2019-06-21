@@ -1,7 +1,6 @@
 from django.db import models
 
-#authen = models.BooleanField("Two-factor Authentication?", default=0)
-
+# Employee
 class Employee(models.Model):
     first_name = models.CharField(max_length=30, primary_key = True)
     last_name = models.CharField(max_length=30)
@@ -26,22 +25,21 @@ class Employee(models.Model):
         return("{} {}".format(self.first_name, self.last_name))
 
 
+# Store pictures that belong to an employee
 class Picture(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
-    picture = models.ImageField(null=True)
+    picture = models.ImageField(upload_to="Dataset/", null=True)
     name = models.CharField(null=True, unique=True, max_length=30)
     
     def __str__(self):
         return("{}".format(self.name))
 
 
-    
-#Save unknown photos
+# Save unknown photos
 class Temp_Photo(models.Model):
     temp_id = models.AutoField(max_length = 100, primary_key = True)
-    picture = models.ImageField(null=True)
+    picture = models.ImageField(upload_to="Temp Photos/", null=True)
+    name = models.CharField(null=True, unique=True, max_length=30)
     
-    def temp_path(instance, filename):
-        return 'temp/{0}'.format(self.temp_id)
-    unknown_photo = models.FileField(upload_to = temp_path)
-    #sends photos to MEDIA_ROOT set in GreeterGuru/GGProject/GreeterGuru/settings.py
+    def __str__(self):
+        return("{}".format(self.name))    
