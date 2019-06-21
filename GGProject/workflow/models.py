@@ -26,7 +26,7 @@ class Employee(models.Model):
     emp_email = models.EmailField(
         null=True,
         max_length = 254,
-        verbose_name="Employee Email"
+        verbose_name="Employee email"
     )
 
     # Employee's manager's email
@@ -43,16 +43,16 @@ class Employee(models.Model):
     
     # Available roles for different types of employees
     PERMISSIONS_CHOICES = ( 
-        (0,'Never'),     # 0 can never unlock door
-        (1,'Sometimes'), # 1 can unlock the door given the alarm is off
-        (2,'Always'),    # 2 can always unlock the door
+        ('0', 'Never'),     # 0 can never unlock door
+        ('1', 'Sometimes'), # 1 can unlock the door given the alarm is off
+        ('2', 'Always'),    # 2 can always unlock the door
     )
     # Employee's access permission level
     emp_permissions = models.CharField(
         max_length = 15,
         choices = PERMISSIONS_CHOICES,
         default = 0,
-        verbose_name="Employee Permissions"
+        verbose_name="Employee permissions"
     )
 
     # Printing an employee outputs their first and last name
@@ -96,7 +96,8 @@ class TempPhoto(models.Model):
     # Temporary ID for a stored photo
     temp_id = models.AutoField(
         max_length = 100,
-        primary_key = True
+        primary_key = True,
+        verbose_name="Temporary ID"
     )
 
     # Actual image file, stored in GreeterGuru/FaceID/TempPhotos
