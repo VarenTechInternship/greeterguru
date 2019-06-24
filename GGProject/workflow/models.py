@@ -56,7 +56,7 @@ class Employee(models.Model):
     )
 
     # Date of the last time the employee logged in
-    login_time = models.DateField(
+    last_login = models.DateField(
         null = True,
         verbose_name = "Last login date"
     )
