@@ -22,6 +22,7 @@ from django.urls import path, include
 >>>>>>> 2d7eba7... Add Django-Admin-Tools
 from django.conf.urls import url
 from django.contrib.auth.views import login
+
 admin.autodiscover()
 
 urlpatterns = [
