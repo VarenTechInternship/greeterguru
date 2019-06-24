@@ -4,6 +4,9 @@ from django.urls import path, include
 from django.conf.urls import url
 from django.contrib.auth.views import login
 
+from workflow.views import updateAD
+from workflow.admin import admin_site
+
 admin.autodiscover()
 
 urlpatterns = [
