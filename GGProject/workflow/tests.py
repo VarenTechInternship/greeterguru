@@ -13,9 +13,9 @@ class BaseViewTest(APITestCase):
 
     # Method for creating employees
     @staticmethod
-    def create_employee(first_name="", last_name="", emp_ID=None, emp_email = "", emp_permissions =None, manager_email = "", key_code = None):
+    def create_employee(first_name = "", last_name = "", emp_ID = None, emp_email = "", emp_permissions = None, manager_email = "", key_code = None):
         if first_name != "" and last_name != "" and  emp_ID != None and emp_permissions != None, and manager_email != "" and key_code != None:
-            Employee.objects.create(first_name=first_name, last_name=last_name, emp_ID=emp_ID, emp_email = emp_email, emp_permissions = emp_permissions, manager_email = manager_email, key_code = key_code)
+            Employee.objects.create(first_name = first_name, last_name = last_name, emp_ID = emp_ID, emp_email = emp_email, emp_permissions = emp_permissions, manager_email = manager_email, key_code = key_code)
 
 
     # Initialize four employees & two admins
