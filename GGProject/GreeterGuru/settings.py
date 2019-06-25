@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,6 +21,8 @@ SITE_ID = 0
 
 # Path to store media files
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "FaceID/")
+
+#APPEND_SLASH = False
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -50,6 +53,7 @@ INSTALLED_APPS = [
     'workflow',
     'django_popup_view_field',
     'rest_framework',
+    'workflow',
 ]
 
 MIDDLEWARE = [
@@ -125,6 +129,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# Settings for REST APIs
+# https://www.django-rest-framework.org/
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
