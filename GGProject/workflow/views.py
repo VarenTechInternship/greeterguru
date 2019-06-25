@@ -7,8 +7,11 @@ from .models import Employee, Picture, TempPhoto
 from .serializers import EmployeesSerializer, PicturesSerializer, TempPhotosSerializer
 
 
-authen = (AllowAny,)     # Use for development
-# authen = (IsAdminUser,) # Use for final implementation
+# Allows access to anyone - Use for development
+authen = (AllowAny,)
+# Only allows access to authenticated admins - Use for final implementation
+#authen = (IsAdminUser,)
+
 
 # API for handling all employees
 class ListEmployees(APIView):
@@ -91,8 +94,7 @@ class EmployeePictures(APIView):
     # Return retrieved pictures
     def get(self, request, emp_ID):
         employee = self.get_employee(emp_ID)
-        pictures = Picture.objects.all().filter(employee=employee)
-        
+        pictures = Picture.objects.all().filter(employee=employee)        
         serializer = PicturesSerializer(pictures, many=True)
         return Response(serializer.data)
 
@@ -149,16 +151,16 @@ class SinglePicture(APIView):
 # API for handling all temporary photos   
 class ListTempPhotos(APIView):
 
-    permission_classes = authen   
+    permission_classes = authen
     
     # Return all temporary photos
-    def get(self):
+    def get(self, request):
         tempPhotos = TempPhoto.objects.all()
         serializer = TempPhotosSerializer(tempPhotos, many=True)
         return Response(serializer.data)
 
     # Create and add new temporary photo
-    def post(self):
+    def post(self, request):
         serializer = TempPhotosSerializer(data={})
         if serializer.is_valid():
             # Add all necessary attributes
@@ -167,3 +169,8 @@ class ListTempPhotos(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Delete all temporary photos
+    def delete(self, request):
+        TempPhoto.objects.all().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
