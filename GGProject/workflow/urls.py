@@ -1,15 +1,9 @@
-# Add url paths for workflow app
-from django.contrib import admin
-from django.urls import path, include
-from django.conf.urls import url
-from django.contrib.auth.views import login
-
-from workflow.views import updateAD
-from workflow.admin import admin_site
-
-admin.autodiscover()
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    url(r'^admin_tools/', include('admin_tools.urls')),
+    path('employees/', views.ListEmployeesView.as_view(), name="employees-all"),
+    path('pictures/', views.ListPicturesView.as_view(), name="pictures-all"),
+    path('temp-photos/', views.ListTempPhotosView.as_view(), name="temp-photos-all"),
+
 ]

@@ -1,24 +1,14 @@
 from django.contrib import admin
-from django.contrib.admin import AdminSite
-from django.contrib.auth.models import User, Group
-from django.contrib.auth.admin import UserAdmin
+from .models import Employee, Picture, TempPhoto
 import django.contrib.auth.admin
-from .models import *
-from . import views
-from workflow.views import updateAD
-admin.autodiscover()
+from django.db import models
+from django.contrib.auth.models import *
+from django.urls import reverse
 
-#admin.site.register(emp)
+# Register your models here.
 admin.site.unregister(Group)
+admin.site.unregister(User)
 
-class site(AdminSite):
-    def get_urls(self):
-        from django.conf.urls import url
-        urls = super(site, self).get_urls()
-        urls = [
-            url(r'^AD/$', self.views(updateAD))
-        ] + urls
-        return urls
-admin_site = site()
-
-#admin_site.register()
+admin.site.register(Employee)
+admin.site.register(Picture)
+admin.site.register(TempPhoto)

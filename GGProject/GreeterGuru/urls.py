@@ -23,4 +23,4 @@ admin.autodiscover()
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^admin_tools/', include('admin_tools.urls')),
-]
+    re_path('api/', include('workflow.urls')),
