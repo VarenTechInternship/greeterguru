@@ -129,9 +129,9 @@ class TempPhoto(models.Model):
         return("{}".format(self.name))
 
 
+    
 # Automatically generate authentication token for every user
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
-
