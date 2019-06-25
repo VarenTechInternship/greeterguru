@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 import rest_framework
+from rest_framework.authtoken import views as authviews
 
 urlpatterns = [
     path('employees/', views.ListEmployees.as_view()),

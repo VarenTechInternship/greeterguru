@@ -74,7 +74,6 @@ class Employee(models.Model):
 
 # Pictures that belong to an employee
 class Picture(models.Model):
-<<<<<<< HEAD
 
     # Employee that the picture belongs to
     employee = models.ForeignKey(
@@ -97,12 +96,6 @@ class Picture(models.Model):
     )
 
     # Printing a picture outputs its shorthand name
-=======
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
-    picture = models.ImageField(upload_to="Dataset/", null=True)
-    name = models.CharField(null=True, max_length=30, unique=True)
-    
->>>>>>> 9317d6a... Update paths
     def __str__(self):
         return("{}".format(self.name))
 
