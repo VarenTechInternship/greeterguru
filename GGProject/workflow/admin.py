@@ -7,7 +7,7 @@ from django.urls import reverse
 
 # Register your models here.
 admin.site.unregister(Group)
-admin.site.unregister(User)
+#admin.site.unregister(User)
 
 admin.site.register(Employee)
 admin.site.register(Picture)

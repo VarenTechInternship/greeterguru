@@ -1,4 +1,9 @@
 from django.db import models
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+
 
 # Registered employee
 class Employee(models.Model):
@@ -122,3 +127,11 @@ class TempPhoto(models.Model):
     # Printing a temporary photo outputs its shorthand name
     def __str__(self):
         return("{}".format(self.name))
+
+
+# Automatically generate authentication token for every user
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
+

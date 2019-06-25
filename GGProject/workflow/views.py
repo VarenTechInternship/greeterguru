@@ -2,12 +2,13 @@ from django.http import Http404
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, AllowAny
 from .models import Employee, Picture, TempPhoto
 from .serializers import EmployeesSerializer, PicturesSerializer, TempPhotosSerializer
 
 
-authen = (IsAuthenticated,)
+authen = (AllowAny,)     # Use for development
+# authen = (IsAdminUser,) # Use for final implementation
 
 # API for handling all employees
 class ListEmployees(APIView):
