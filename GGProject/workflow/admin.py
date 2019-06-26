@@ -3,35 +3,19 @@ from django.contrib.admin import AdminSite
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin
 import django.contrib.auth.admin
-from .models import *
 from . import views
-<<<<<<< HEAD
-from workflow.views import updateAD
+from .models import Employee, Picture, TempPhoto
+
+
 admin.autodiscover()
 
-=======
+def customize_admin():
 
-from .models import Employee, Picture
-admin.autodiscover()
+    # Unregister default models
+    admin.site.unregister(Group)
+    admin.site.unregister(User)
 
->>>>>>> 6121372... Fix merge errors
-#admin.site.register(emp)
-admin.site.unregister(Group)
-
-<<<<<<< HEAD
-class site(AdminSite):
-    def get_urls(self):
-        from django.conf.urls import url
-        urls = super(site, self).get_urls()
-        urls = [
-            url(r'^AD/$', self.views(updateAD))
-        ] + urls
-        return urls
-admin_site = site()
-
-#admin_site.register()
-=======
-# Register your models here.
-admin.site.register(Employee)
-admin.site.register(Picture)
->>>>>>> 6121372... Fix merge errors
+    # Register create models
+    admin.site.register(Employee)
+    admin.site.register(Picture)
+    admin.site.register(TempPhoto)
