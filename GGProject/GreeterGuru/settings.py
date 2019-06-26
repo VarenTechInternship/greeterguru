@@ -56,8 +56,11 @@ INSTALLED_APPS = [
     'rest_auth',
     'workflow',
     'django_popup_view_field',
+<<<<<<< HEAD
 =======
 >>>>>>> e8f4535... Change settings.py to remove duplicate applicaton names
+=======
+>>>>>>> 7d80eee... Fix authtoken bug
 ]
 
 MIDDLEWARE = [
