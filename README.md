@@ -23,25 +23,25 @@ $ pip3 install -r requirements.txt
 ## Running the Application
 ```bash
 $ cd GGProject
-$ python manage.py makemigrations #Create Database Tables
+$ python3 manage.py makemigrations #Create Database Tables
+$ python3 manage.py migrate --run-syncdb #Create New Migration File and Inserts Model Data into Database
+$ python3 manage.py runserver #Run Server
 ```
---> For First Login / Migration Create Superuser:
+--> During First Login / Migration Create Superuser:
 ```bash
-$ python manage.py createsuperuser #Create Login Root User
-$ python manage.py migrate --run-syncdb #Create New Migration File and Inserts Model Data into Database
-$ python manage.py runserver #Run Server
+$ python3 manage.py makemigrations
+$ python3 manage.py createsuperuser #Create Login Root User
 ```
-
 ## If Needed, Flush Database and Reset Migrations
 ```bash
 $ cd GGProject
-$ python manage.py flush #Flush Database
+$ python3 manage.py flush #Flush Database
 $ find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
 $ find . -path "*/migrations/*.pyc"  -delete #Delete all Files in Migrations Folder except __init__.py
-$ python manage.py makemigrations #Create Tables
-$ python manage.py createsuperuser #Create Admin User
-$ python manage.py migrate --run-syncdb #Migrate and Put Model Information in Database
-$ python manage.py runserver #Run Server
+$ python3 manage.py makemigrations #Create Tables
+$ python3 manage.py createsuperuser #Create Admin User
+$ python3 manage.py migrate --run-syncdb #Migrate and Put Model Information in Database
+$ python3 manage.py runserver #Run Server
 ```
 
 ## Directories Overview
