@@ -23,8 +23,8 @@ def ListEmployees(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-    
-    
+
+
 # API for handling a single employee based on their employee ID
 @api_view(['GET', 'PUT', 'DELETE'])
 def SingleEmployee(request, emp_ID):
@@ -47,15 +47,15 @@ def SingleEmployee(request, emp_ID):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
     # Delete retrieved employee
     elif request.method == 'DELETE':
         employee.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    
 
-# API for handling all pictures    
+
+
+# API for handling all pictures
 @api_view(['GET'])
 def ListPictures(request):
 
@@ -65,7 +65,7 @@ def ListPictures(request):
         serializer = PicturesSerializer(pictures, many=True)
         return Response(serializer.data)
 
-    
+
 # API for handling pictures based on employee ID of the employee they belong to
 @api_view(['GET', 'POST'])
 def EmployeePictures(request, emp_ID):
@@ -87,7 +87,7 @@ def EmployeePictures(request, emp_ID):
     # Create new picture belonging to retrieved employee
     elif request.method == 'POST':
         serializer = PicturesSerializer(data={})
-    
+
         if serializer.is_valid():
             serializer.validated_data["employee"] = employee
             serializer.validated_data["picture"] = request.FILES['file']
@@ -95,9 +95,9 @@ def EmployeePictures(request, emp_ID):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
-# API for handling a single picture based on its name   
+
+# API for handling a single picture based on its name
 @api_view(['GET', 'PUT', 'DELETE'])
 def SinglePicture(request, name):
 
@@ -119,7 +119,7 @@ def SinglePicture(request, name):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     # Delete retrieved picture
     elif request.method == 'DELETE':
         picture.delete()

@@ -1,6 +1,7 @@
 from django.db import models
 import os
 
+
 # Registered employee
 class Employee(models.Model):
 
