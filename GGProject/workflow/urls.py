@@ -5,7 +5,7 @@ from django.conf.urls import url
 from django.contrib.auth.views import login
 from django.urls import path
 from . import views
-import rest_framework
+from rest_framework.authtoken import views as authviews
 
 admin.autodiscover()
 
@@ -16,5 +16,5 @@ urlpatterns = [
     path('pictures/<int:emp_ID>/', views.EmployeePictures.as_view()),
     path('pictures/<str:name>/', views.SinglePicture.as_view()),
     path('temp-photos/', views.ListTempPhotos.as_view()),
-    path('token-auth/', rest_framework.authtoken.views.obtain_auth_token),
+    path('token-auth/', authviews.obtain_auth_token),
 ]
