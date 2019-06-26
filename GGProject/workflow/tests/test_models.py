@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from django.test import TestCase, Client
 from django.urls import reverse
 from workflow.models import Employee, Picture, TempPhoto
@@ -118,3 +119,7 @@ class EmployeeTests(TestCase):
         Employee.objects.all().delete()
         Picture.objects.all().delete()
         TempPhoto.objects.all().delete()
+=======
+from django.test import TestCase
+import unittest
+>>>>>>> Create tests directory for app workflow. Create test files for admin, forms, models, views
