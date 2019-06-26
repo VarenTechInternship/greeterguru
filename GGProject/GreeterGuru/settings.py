@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'workflow',
     'django_popup_view_field',
     'rest_framework',
-    'workflow',
 ]
 
 MIDDLEWARE = [
