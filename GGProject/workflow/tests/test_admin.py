@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from django.test import TestCase, Client
 import unittest
 
@@ -28,7 +27,3 @@ class SimpleTest(unittest.TestCase):
         client = Client()
         response = client.get('/workflow/picture/add/')
         self.assertEqual(response.status_code, 302)
-=======
-from django.test import TestCase
-import unittest
->>>>>>> Create tests directory for app workflow. Create test files for admin, forms, models, views
