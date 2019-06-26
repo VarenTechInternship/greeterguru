@@ -15,10 +15,14 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
-from rest_framework.authtoken import views
+from django.urls import path, include, re_path
+from django.conf.urls import url
+from django.contrib.auth.views import login
+
+admin.autodiscover()
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('workflow.urls')),
+    path('', admin.site.urls),
+    url(r'^admin_tools/', include('admin_tools.urls')),
+    re_path('api/', include('workflow.urls')),
 ]

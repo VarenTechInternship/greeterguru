@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
 
+
 # Registered employee
 class Employee(models.Model):
 

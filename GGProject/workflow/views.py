@@ -31,8 +31,8 @@ class ListEmployees(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-    
-    
+
+
 # API for handling a single employee based on their employee ID
 class SingleEmployee(APIView):
 
@@ -59,7 +59,7 @@ class SingleEmployee(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
     # Delete retrieved employee
     def delete(self, request, emp_ID, format=None):
         employee = self.get_employee(emp_ID)
@@ -78,7 +78,7 @@ class ListPictures(APIView):
         serializer = PicturesSerializer(pictures, many=True)
         return Response(serializer.data)
 
-    
+
 # API for handling pictures based on employee ID of the employee they belong to
 class EmployeePictures(APIView):
 
@@ -102,7 +102,6 @@ class EmployeePictures(APIView):
     def post(self, request, emp_ID):
         employee = self.get_employee(emp_ID)
         serializer = PicturesSerializer(data={})
-        
         if serializer.is_valid():
             # Add all necessary attributes
             serializer.validated_data["employee"] = employee
@@ -111,7 +110,7 @@ class EmployeePictures(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 # API for handling a single picture based on its name   
 class SinglePicture(APIView):
@@ -139,7 +138,7 @@ class SinglePicture(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     # Delete retrieved picture
     def delete(self, request, name):
         picture = self.get_picture(name)

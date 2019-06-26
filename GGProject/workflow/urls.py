@@ -1,6 +1,13 @@
+# Add url paths for workflow app
+from django.contrib import admin
+from django.urls import path, include
+from django.conf.urls import url
+from django.contrib.auth.views import login
 from django.urls import path
 from . import views
 import rest_framework
+
+admin.autodiscover()
 
 urlpatterns = [
     path('employees/', views.ListEmployees.as_view()),
