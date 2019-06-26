@@ -51,10 +51,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_cleanup.apps.CleanupConfig',
     'rest_framework',
+<<<<<<< HEAD
     'rest_framework.authtoken',
     'rest_auth',
     'workflow',
     'django_popup_view_field',
+=======
+>>>>>>> e8f4535... Change settings.py to remove duplicate applicaton names
 ]
 
 MIDDLEWARE = [
