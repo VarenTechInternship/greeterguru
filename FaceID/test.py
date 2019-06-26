@@ -1,39 +1,77 @@
-import requests, json
+import requests, json, getpass
 from django.core.files import File
 
-def main():
-    # Retrieve all employees and display their information
+
+# Create authentication header containing admin token
+def authenticate():
+    # Set admin information
+    username = "admin"
+    password = getpass.getpass(prompt="Admin Password: ")
+    data = {
+        "username": username,
+        "password": password,
+    }
+
+    # Retrieve token and create authentication header
+    response = requests.post("http://localhost:8000/api/token-auth/", json=data)
+    content = response.json()
+    token = content["token"]
+    headers = {'Authorization':'Token ' + token}
+
+    return headers
+
+
+# Retrieve and display all employees
+def display_employees():
+    # Retrieve all employees
     response = requests.get("http://localhost:8000/api/employees/")
     content = response.json()
 
+    # Display all employees
     for person in content:
         for key in person:
             print(key + ":", person[key])
         print()
+        
+    return content
 
 
-    # Attempt to post an image to the database
-    # (Requires employee with emp_ID 400 to exist)
-    files = {"file" : open('cat.jpg', 'rb')}
-    response = requests.post("http://localhost:8000/api/pictures/400/", files=files)
-    
-    """
-    # Create employee object
+# Add employee object to database
+def create_employee():
+    # Define employee data
     data = {
         "first_name": "Jaylan",
         "last_name": "Hall",
-        "email": "hallj@varentech.com",
         "emp_ID": 400,
+        "emp_email": "hallj@varentech.com",
+        "manage_email": "parksw@varentech.com",
         "keycode": 12345,
+        "emp_permissions": '1',
     }
 
-    response = requests.post("http://localhost:8000/api/employees/", json=data)
-    """
-    
-    # Verify whether the request was successful
+    # Attempt to create employee object
+    try:
+        response = requests.post("http://localhost:8000/api/employees/", json=data)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(err)
+        
+    return response
+
+
+# Display whether a request was successful
+def verify(response):
     if response:
         print("SUCCESS!")
     else:
         print("whoops...")
+
+
+def main():
+    
+   create_employee()
+   verify()
+   display_employees()
+
     
 main()

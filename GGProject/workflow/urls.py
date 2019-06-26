@@ -5,13 +5,16 @@ from django.conf.urls import url
 from django.contrib.auth.views import login
 from django.urls import path
 from . import views
+from rest_framework.authtoken import views as authviews
 
 admin.autodiscover()
 
 urlpatterns = [
-    path('employees/', views.ListEmployees),
-    path('employees/<int:emp_ID>/', views.SingleEmployee),
-    path('pictures/', views.ListPictures),
-    path('pictures/<int:emp_ID>/', views.EmployeePictures),
-    path('pictures/<str:name>/', views.SinglePicture),
+    path('employees/', views.ListEmployees.as_view()),
+    path('employees/<int:emp_ID>/', views.SingleEmployee.as_view()),
+    path('pictures/', views.ListPictures.as_view()),
+    path('pictures/<int:emp_ID>/', views.EmployeePictures.as_view()),
+    path('pictures/<str:name>/', views.SinglePicture.as_view()),
+    path('temp-photos/', views.ListTempPhotos.as_view()),
+    path('token-auth/', authviews.obtain_auth_token),
 ]

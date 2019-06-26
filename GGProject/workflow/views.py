@@ -1,23 +1,31 @@
-from django.db import models
+from django.http import Http404
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Employee, Picture
-from .serializers import EmployeesSerializer, PicturesSerializer
+from rest_framework.permissions import IsAdminUser, AllowAny
+from .models import Employee, Picture, TempPhoto
+from .serializers import EmployeesSerializer, PicturesSerializer, TempPhotosSerializer
+
+
+# Allows access to anyone - Use for development
+authen = (AllowAny,)
+# Only allows access to authenticated admins - Use for final implementation
+#authen = (IsAdminUser,)
 
 
 # API for handling all employees
-@api_view(['GET', 'POST'])
-def ListEmployees(request):
+class ListEmployees(APIView):
 
+    permission_classes = authen
+    
     # Return all employee information
-    if request.method == 'GET':
+    def get(self, request, format=None):
         employees = Employee.objects.all()
         serializer = EmployeesSerializer(employees, many=True)
         return Response(serializer.data)
 
     # Add new employee to database
-    elif request.method == 'POST':
+    def post(self, request, format=None):
         serializer = EmployeesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -26,22 +34,26 @@ def ListEmployees(request):
 
 
 # API for handling a single employee based on their employee ID
-@api_view(['GET', 'PUT', 'DELETE'])
-def SingleEmployee(request, emp_ID):
+class SingleEmployee(APIView):
+
+    permission_classes = authen
 
     # Retrieve employee according to passed employee ID
-    try:
-        employee = Employee.objects.get(emp_ID=emp_ID)
-    except Employee.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
+    def get_employee(self, emp_ID):
+        try:
+            return Employee.objects.get(emp_ID=emp_ID)
+        except Employee.DoesNotExist:
+            raise Http404
+    
     # Return retrieved employee
-    if request.method == 'GET':
+    def get(self, request, emp_ID, format=None):
+        employee = self.get_employee(emp_ID)
         serializer = EmployeesSerializer(employee)
         return Response(serializer.data)
 
     # Update the retrieved employee
-    elif request.method == 'PUT':
+    def put(self, request, emp_ID, format=None):
+        employee = self.get_employee(emp_ID)
         serializer = EmployeesSerializer(employee, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -49,46 +61,49 @@ def SingleEmployee(request, emp_ID):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # Delete retrieved employee
-    elif request.method == 'DELETE':
+    def delete(self, request, emp_ID, format=None):
+        employee = self.get_employee(emp_ID)
         employee.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
+    
 
 # API for handling all pictures
-@api_view(['GET'])
-def ListPictures(request):
+class ListPictures(APIView):
 
-    # Return all pictures
-    if request.method == 'GET':
+    permission_classes = authen
+
+    # Retrieve all pictures
+    def get(self, request):
         pictures = Picture.objects.all()
         serializer = PicturesSerializer(pictures, many=True)
         return Response(serializer.data)
 
 
 # API for handling pictures based on employee ID of the employee they belong to
-@api_view(['GET', 'POST'])
-def EmployeePictures(request, emp_ID):
+class EmployeePictures(APIView):
 
-    # Retrieve employee based on passed employee ID
-    try:
-        employee = Employee.objects.get(emp_ID=emp_ID)
-    except Employee.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    permission_classes = authen   
 
-    # Retrieve all pictures belonging to that employee
-    pictures = Picture.objects.all().filter(employee=employee)
-
+    # Retrieve employee according to passed employee ID
+    def get_employee(self, emp_ID):
+        try:
+            return Employee.objects.get(emp_ID=emp_ID)
+        except Employee.DoesNotExist:
+            raise Http404
+    
     # Return retrieved pictures
-    if request.method == 'GET':
+    def get(self, request, emp_ID):
+        employee = self.get_employee(emp_ID)
+        pictures = Picture.objects.all().filter(employee=employee)        
         serializer = PicturesSerializer(pictures, many=True)
         return Response(serializer.data)
 
     # Create new picture belonging to retrieved employee
-    elif request.method == 'POST':
+    def post(self, request, emp_ID):
+        employee = self.get_employee(emp_ID)
         serializer = PicturesSerializer(data={})
-
         if serializer.is_valid():
+            # Add all necessary attributes
             serializer.validated_data["employee"] = employee
             serializer.validated_data["picture"] = request.FILES['file']
             serializer.validated_data["name"] = request.FILES['file'].name[:-4]
@@ -97,23 +112,27 @@ def EmployeePictures(request, emp_ID):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# API for handling a single picture based on its name
-@api_view(['GET', 'PUT', 'DELETE'])
-def SinglePicture(request, name):
+# API for handling a single picture based on its name   
+class SinglePicture(APIView):
 
-    # Retrieve picture based on based name
-    try:
-        picture = Picture.objects.get(name=name)
-    except Picture.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    permission_classes = authen   
 
-    # Return retrieved picture
-    if request.method == 'GET':
+    # Retrieve picture according to passed name
+    def get_picture(self, name):
+        try:
+            return Picture.objects.get(name=name)
+        except Picture.DoesNotExist:
+            raise Http404
+    
+    # Return picture information
+    def get(self, request, name):
+        picture = self.get_picture(name)
         serializer = PicturesSerializer(picture)
         return Response(serializer.data)
 
-    # Update retrieved picture
-    elif request.method == 'PUT':
+    # Update picture
+    def put(self, request, name):
+        picture = self.get_picture(name)
         serializer = PicturesSerializer(picture, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -121,6 +140,36 @@ def SinglePicture(request, name):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # Delete retrieved picture
-    elif request.method == 'DELETE':
+    def delete(self, request, name):
+        picture = self.get_picture(name)
         picture.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+    
+# API for handling all temporary photos   
+class ListTempPhotos(APIView):
+
+    permission_classes = authen
+    
+    # Return all temporary photos
+    def get(self, request):
+        tempPhotos = TempPhoto.objects.all()
+        serializer = TempPhotosSerializer(tempPhotos, many=True)
+        return Response(serializer.data)
+
+    # Create and add new temporary photo
+    def post(self, request):
+        serializer = TempPhotosSerializer(data={})
+        if serializer.is_valid():
+            # Add all necessary attributes
+            serializer.validated_data["unknown_photo"] = request.FILES['file']
+            serializer.validated_data["name"] = request.FILES['file'].name[:-4]
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Delete all temporary photos
+    def delete(self, request):
+        TempPhoto.objects.all().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
