@@ -1,0 +1,69 @@
+from django.test import LiveServerTestCase
+from django.core.files import File
+import requests, json, getpass
+
+
+url = "http://localhost:8000/api/"
+
+# Creates two employee objects
+def create_employees():
+    
+    data = {
+        "first_name":"Kendall",
+        "last_name":"Kempton",
+        "emp_ID":500,
+        "emp_email":"kemptonk@varentech.com",
+        "manager_email":"parksw@varentech.com",
+        "keycode":12345,
+        "emp_permissions":'1',
+        #"last_login":"19-06-26",
+    }
+    
+    try:
+        response = requests.post(url + "employees/", json=data)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(err)
+        
+    data = {
+        "first_name":"Caroline",
+        "last_name":"Orndorff",
+        "emp_ID":300,
+        "emp_email":"orndorffc@varentech.com",
+        "manager_email":"parksw@varentech.com",
+        "keycode":54321,
+        "emp_permissions":'1',
+        #"last_login":"19-06-26",
+    }
+    
+    try:
+        response = requests.post(url + "employees/", json=data)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(err)
+
+
+# Retrieve all employees
+def get_all_employees():
+        
+    try:
+        response = requests.get(url + "employees/")
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(err)
+
+    return response
+
+
+def main():
+
+    create_employees()
+    
+    response = get_all_employees()
+    content = response.json()
+    for employee in content:
+        for attribute in employee:
+            print(attribute + ": " + str(employee[attribute]))
+
+
+main()

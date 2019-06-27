@@ -72,6 +72,7 @@ def verify(response):
 
 
 def main():
+<<<<<<< HEAD
 
     #response = create_employee()
     #verify(response)
@@ -85,4 +86,11 @@ def main():
     except requests.exceptions.HTTPError as err:
         print(err)
 
+=======
+    
+    response = create_employee()
+    verify(response)
+    display_employees()
+
+>>>>>>> 5796846... Create tests for every Employee API
 main()
