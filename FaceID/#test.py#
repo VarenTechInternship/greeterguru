@@ -34,7 +34,7 @@ def display_employees():
         for key in person:
             print(key + ":", person[key])
         print()
-
+        
     return content
 
 
@@ -59,7 +59,7 @@ def create_employee():
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print(err)
-
+        
     return response
 
 
@@ -72,7 +72,7 @@ def verify(response):
 
 
 def main():
-
+    
     #response = create_employee()
     #verify(response)
     display_employees()
@@ -84,5 +84,5 @@ def main():
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print(err)
-
+    
 main()
