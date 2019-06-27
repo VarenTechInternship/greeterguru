@@ -5,8 +5,28 @@
 version: 2
 jobs:
   build:
+    working_directory: ~/GreeterGuru
     docker:
-      - image: circleci/ruby:2.4.1
+      - image: circleci/python:3.7.3
     steps:
       - checkout
-      - run: echo "A first hello"
+      - restore_cache: # ensure this step occurs *before* install dependencies
+          key: deps10-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+      - run: 
+          command: | # use pipenv to install dependencies
+            sudo pip install pipenv
+            pipenv install 
+            pipenv run python GGProject/manage.py test
+      - save_cache:
+          key: deps10-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          paths:
+            - '.venv'
+            - '/usr/local/bin'
+      - run:
+          command: |
+            pipenv run python GGProject/manage.py test
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+          destination: tr1
