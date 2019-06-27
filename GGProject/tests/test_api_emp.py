@@ -1,6 +1,7 @@
 from django.test import LiveServerTestCase
 from workflow.models import Employee
-import requests, json
+import requests as req
+import json
 
 
 class EmployeeTests(LiveServerTestCase):
@@ -22,9 +23,9 @@ class EmployeeTests(LiveServerTestCase):
         }
 
         try:
-            response = requests.post(url + "employees/", json=data)
+            response = req.post(url + "employees/", json=data)
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
         data = {
@@ -39,9 +40,9 @@ class EmployeeTests(LiveServerTestCase):
         }
         
         try:
-            response = requests.post(url + "employees/", json=data)
+            response = req.post(url + "employees/", json=data)
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
 
@@ -51,9 +52,9 @@ class EmployeeTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
 
         try:
-            response = requests.get(url + "employees/")
+            response = req.get(url + "employees/")
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
         content = response.json()
@@ -72,9 +73,9 @@ class EmployeeTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
 
         try:
-            response = requests.get(url + "employees/" + str(emp_ID) + "/")
+            response = req.get(url + "employees/" + str(emp_ID) + "/")
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
         employee = response.json()
@@ -96,10 +97,9 @@ class EmployeeTests(LiveServerTestCase):
         }
 
         try:
-            response = requests.put(url + "employees/" + str(old_emp_ID) + "/",
-                                    json=data)
+            response = req.put(url + "employees/" + str(old_emp_ID) + "/", json=data)
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
         return response
@@ -111,9 +111,9 @@ class EmployeeTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
 
         try:
-            response = requests.delete(url + "employees/" + str(emp_ID) + "/")
+            response = req.delete(url + "employees/" + str(emp_ID) + "/")
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
             
         return response

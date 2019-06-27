@@ -2,7 +2,8 @@ from django.test import LiveServerTestCase
 from django.core.files import File
 from GreeterGuru.settings import MEDIA_ROOT
 from workflow.models import TempPhoto
-import requests, json
+import requests as req
+import json
 
 
 # Requires files temp1.jpg, temp2.jpg, and temp3.jpg
@@ -17,9 +18,9 @@ class TempPhotoTests(LiveServerTestCase):
         files = {"file" : open(pic_name, 'rb')}
 
         try:
-            response = requests.post(url + "temp-photos/", files=files)
+            response = req.post(url + "temp-photos/", files=files)
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
         return response
@@ -31,9 +32,9 @@ class TempPhotoTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
 
         try:
-            response = requests.get(url + "temp-photos/")
+            response = req.get(url + "temp-photos/")
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
         content = response.json()
@@ -52,9 +53,9 @@ class TempPhotoTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
         
         try:
-            response = requests.delete(url + "temp-photos/")
+            response = req.delete(url + "temp-photos/")
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
     
         return response

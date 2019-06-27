@@ -2,7 +2,8 @@ from django.test import LiveServerTestCase
 from django.core.files import File
 from GreeterGuru.settings import MEDIA_ROOT
 from workflow.models import Employee, Picture
-import requests, json
+import requests as req
+import json
 
 
 # Requires files 300_0.jpg, 300_1.jpg, 500_0.jpg, and 500_1.jpg 
@@ -26,9 +27,9 @@ class PictureTests(LiveServerTestCase):
         }
 
         try:
-            response = requests.post(url + "employees/", json=data)
+            response = req.post(url + "employees/", json=data)
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
 
@@ -44,9 +45,9 @@ class PictureTests(LiveServerTestCase):
         }
         
         try:
-            response = requests.post(url + "employees/", json=data)
+            response = req.post(url + "employees/", json=data)
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
 
@@ -57,9 +58,9 @@ class PictureTests(LiveServerTestCase):
 
         files = {"file" : open(pic_name, 'rb')}
         try:
-            response = requests.post(url + "pictures/" + str(emp_ID) + "/", files=files)
+            response = req.post(url + "pictures/" + str(emp_ID) + "/", files=files)
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
             
@@ -69,9 +70,9 @@ class PictureTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
 
         try:
-            response = requests.get(url + "pictures/")
+            response = req.get(url + "pictures/")
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
         content = response.json()
@@ -90,9 +91,9 @@ class PictureTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
 
         try:
-            response = requests.get(url + "pictures/" + str(emp_ID) + "/")
+            response = req.get(url + "pictures/" + str(emp_ID) + "/")
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
         content = response.json()
@@ -111,9 +112,9 @@ class PictureTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
 
         try:
-            response = requests.get(url + "pictures/" + name + "/")
+            response = req.get(url + "pictures/" + name + "/")
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
         picture = response.json()
@@ -135,9 +136,9 @@ class PictureTests(LiveServerTestCase):
         }
 
         try:
-            response = requests.put(url + "pictures/" + old_name + "/", json=data)
+            response = req.put(url + "pictures/" + old_name + "/", json=data)
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
         return response
@@ -149,9 +150,9 @@ class PictureTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
 
         try:
-            response = requests.delete(url + "pictures/" + name + "/")
+            response = req.delete(url + "pictures/" + name + "/")
             response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
+        except req.exceptions.HTTPError as err:
             print(err)
 
         return response
