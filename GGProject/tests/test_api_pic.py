@@ -2,7 +2,7 @@ from django.test import LiveServerTestCase
 from django.core.files import File
 from GreeterGuru.settings import MEDIA_ROOT
 from workflow.models import Employee, Picture
-import requests, json, getpass
+import requests, json
 
 
 # Requires files 300_0.jpg, 300_1.jpg, 500_0.jpg, and 500_1.jpg 
@@ -79,7 +79,8 @@ class PictureTests(LiveServerTestCase):
         for picture in content:
             for key in picture:
                 print(key + ":", picture[key])
-            
+            print()
+                
         return response
 
     
@@ -99,6 +100,7 @@ class PictureTests(LiveServerTestCase):
         for picture in content:
             for key in picture:
                 print(key + ":", picture[key])
+            print()
             
         return response
 
@@ -118,6 +120,7 @@ class PictureTests(LiveServerTestCase):
 
         for key in picture:
             print(key + ":", picture[key])
+        print()
             
         return response
     
@@ -128,7 +131,7 @@ class PictureTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
         
         data = {
-            "name":new_name,
+            "name": new_name,
         }
 
         try:
@@ -168,22 +171,22 @@ class PictureTests(LiveServerTestCase):
         self.add_picture(500, MEDIA_ROOT + "TestPics/500_1.jpg")
 
         # Display all pictures
-        print("ALL PICTURES:")
+        print("ALL PICTURES, INITIAL:")
         self.get_pictures()
         print()
         # Display pictures belonging to employee 300
-        print("EMPLOYEE 300 PICTURES:")
-        self.get_emp_pictures(300)
+        print("EMPLOYEE 500 PICTURES, INITIAL:")
+        self.get_emp_pictures(500)
         print()
         # Display picture 300_0
-        print("EMPLOYEE 300, PICTURE 0:")
-        self.get_single_picture("300_0")
+        print("EMPLOYEE 500 PICTURE 2, INITIAL:")
+        self.get_single_picture("500_1")
         print()
 
-        # Update name of picture 500_0
+        # Change picture 500_1 to 500_2
         self.update_picture_name("500_1", "500_2")
-        # Display updated picture
-        print("UPDATED PICTURE 500_1 to 500_2:")
+        # Display employee 500 pictures
+        print("EMPLOYEE 500 PICTURES, AFTER CHANGING 500_1 TO 500_2:")
         self.get_emp_pictures(500)
         print()
 

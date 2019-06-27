@@ -1,10 +1,10 @@
 from django.test import LiveServerTestCase
-from django.core.files import File
-import requests, json, getpass
+from workflow.models import Employee
+import requests, json
 
 
 class EmployeeTests(LiveServerTestCase):
-
+    
     # Creates two employee objects
     def create_employees(self):
 
@@ -18,7 +18,7 @@ class EmployeeTests(LiveServerTestCase):
             "manager_email":"parksw@varentech.com",
             "keycode":12345,
             "emp_permissions":'1',
-            "last_login":"2019-06-26",
+            "last_login":"2019-06-27",
         }
 
         try:
@@ -27,7 +27,6 @@ class EmployeeTests(LiveServerTestCase):
         except requests.exceptions.HTTPError as err:
             print(err)
 
-
         data = {
             "first_name":"Caroline",
             "last_name":"Orndorff",
@@ -35,8 +34,8 @@ class EmployeeTests(LiveServerTestCase):
             "emp_email":"orndorffc@varentech.com",
             "manager_email":"parksw@varentech.com",
             "keycode":54321,
-            "emp_permissions":'1',
-            "last_login":"2019-06-26",
+            "emp_permissions":'2',
+            "last_login":"2019-06-27",
         }
         
         try:
@@ -46,7 +45,7 @@ class EmployeeTests(LiveServerTestCase):
             print(err)
 
 
-    # Retrieve all employees
+    # Retrieve and display all employees
     def get_all_employees(self):
         
         url = str(self.live_server_url) + "/api/"
@@ -57,6 +56,13 @@ class EmployeeTests(LiveServerTestCase):
         except requests.exceptions.HTTPError as err:
             print(err)
 
+        content = response.json()
+
+        for employee in content:
+            for key in employee:
+                print(key + ":", employee[key])
+            print()
+                
         return response
 
 
@@ -70,6 +76,12 @@ class EmployeeTests(LiveServerTestCase):
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
             print(err)
+
+        employee = response.json()
+
+        for key in employee:
+            print(key + ":", employee[key])
+        print()
 
         return response
             
@@ -103,27 +115,39 @@ class EmployeeTests(LiveServerTestCase):
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
             print(err)
-
+            
         return response
 
     
     # Tests all employee API functionalities
-    # Should display two HTTP 400 errors
     def test_employees(self):
 
-        # Create two empoyees (emp_ID = 300, 500)
-        self.create_employees()
-        # Retrieve both employees
-        self.get_all_employees()
+        print()
         
-        # Fail to retrieve employee with emp_ID = 400
-        self.get_single_employee(400)
-        # Change emp_ID 500 to 400
-        self.update_employee_ID(500, 400)
-        # Successfully retrieve employee with emp_ID = 400
-        self.get_single_employee(400)
-
+        # Create two employees (emp_ID = 300, 500)
+        self.create_employees()
+        # Display all employees
+        print("ALL EMPLOYEES, INITIAL:")
+        self.get_all_employees()
+        print()
+        # Display employee 500
+        print("EMPLOYEE 500, INITIAL:")
+        self.get_single_employee(500)
+        print()
+        
+        # Change emp_ID 500 to 600
+        self.update_employee_ID(500, 600)
+        # Display all employees
+        print("EMPLOYEE 500, AFTER UPDATING EMP_ID TO 600:")
+        self.get_single_employee(600)
+        print()
+        
         # Delete employee with ID 300
         self.delete_employee(300)
-        # Fail to retrive employee with emp_ID = 300
-        self.get_single_employee(300)
+        # Display all employees
+        print("ALL EMPLOYEES, AFTER DELETING EMPLOYEE 300:")
+        self.get_all_employees()
+        print()
+
+        # Manually delete all Employee objects
+        Employee.objects.all().delete()

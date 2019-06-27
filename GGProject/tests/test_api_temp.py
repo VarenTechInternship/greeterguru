@@ -1,8 +1,8 @@
 from django.test import LiveServerTestCase
 from django.core.files import File
 from GreeterGuru.settings import MEDIA_ROOT
-from workflow.models import Employee, Picture, TempPhoto
-import requests, json, getpass
+from workflow.models import TempPhoto
+import requests, json
 
 
 # Requires files temp1.jpg, temp2.jpg, and temp3.jpg
@@ -15,6 +15,7 @@ class TempPhotoTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
 
         files = {"file" : open(pic_name, 'rb')}
+
         try:
             response = requests.post(url + "temp-photos/", files=files)
             response.raise_for_status()
@@ -40,7 +41,8 @@ class TempPhotoTests(LiveServerTestCase):
         for photo in content:
             for key in photo:
                 print(key + ":", photo[key])
-
+            print()
+            
         return response
     
 
@@ -55,7 +57,9 @@ class TempPhotoTests(LiveServerTestCase):
         except requests.exceptions.HTTPError as err:
             print(err)
     
-    
+        return response
+
+            
     # Tests all TempPhoto API functionalities            
     def test_temp_photos(self):
 
@@ -67,7 +71,7 @@ class TempPhotoTests(LiveServerTestCase):
         self.create_temp_photo(MEDIA_ROOT + "/TestPics/temp3.jpg")
 
         # Display all temporary photos
-        print("ALL TEMPORARY PHOTOS:")
+        print("ALL TEMPORARY PHOTOS, INITIAL:")
         self.get_temp_photos()
         print()
 
@@ -76,6 +80,8 @@ class TempPhotoTests(LiveServerTestCase):
         # Confirm they were deleted
         if TempPhoto.DoesNotExist:
             print("ALL TEMP PHOTOS SUCCESSFULLY DELETED")
+        else:
+            print("DELETION OF ALL TEMP PHOTOS FAILED")
             
         # Manually delete all TempPhoto objects
         TempPhoto.objects.all().delete()
