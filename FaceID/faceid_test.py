@@ -1,6 +1,7 @@
 import requests, json, getpass
 from django.core.files import File
 
+# FIXME: This is known currently fail on Django Unit Testing
 
 # Create authentication header containing admin token
 def authenticate():
