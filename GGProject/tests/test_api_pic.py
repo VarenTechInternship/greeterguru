@@ -5,7 +5,9 @@ from workflow.models import Employee, Picture
 import requests, json, getpass
 
 
-class viewTests(LiveServerTestCase):
+# Requires files 300_0.jpg, 300_1.jpg, 500_0.jpg, and 500_1.jpg 
+# to be located at GreeterGuru/FaceID/TestPics/
+class PictureTests(LiveServerTestCase):
 
     # Creates two employee objects
     def create_employees(self):
@@ -61,7 +63,7 @@ class viewTests(LiveServerTestCase):
             print(err)
 
             
-     # Retrieve and display all pictures
+    # Retrieve and display all pictures
     def get_pictures(self):
 
         url = str(self.live_server_url) + "/api/"
@@ -101,7 +103,7 @@ class viewTests(LiveServerTestCase):
         return response
 
     
-    # Retrieve a single picture based on a name
+    # Retrieve and display a single picture based on a name
     def get_single_picture(self, name):
 
         url = str(self.live_server_url) + "/api/"
@@ -160,10 +162,10 @@ class viewTests(LiveServerTestCase):
         # Create two employees to add pictures to (emp_ID = 300, 500)
         self.create_employees()
         # Add two pictures to employee 300 and one to employee 500
-        self.add_picture(300, MEDIA_ROOT + "300_0.jpg")
-        self.add_picture(300, MEDIA_ROOT + "300_1.jpg")
-        self.add_picture(500, MEDIA_ROOT + "500_0.jpg")
-        self.add_picture(500, MEDIA_ROOT + "500_1.jpg")
+        self.add_picture(300, MEDIA_ROOT + "TestPics/300_0.jpg")
+        self.add_picture(300, MEDIA_ROOT + "TestPics/300_1.jpg")
+        self.add_picture(500, MEDIA_ROOT + "TestPics/500_0.jpg")
+        self.add_picture(500, MEDIA_ROOT + "TestPics/500_1.jpg")
 
         # Display all pictures
         print("ALL PICTURES:")
@@ -199,5 +201,6 @@ class viewTests(LiveServerTestCase):
         self.get_pictures()
         print()
         
-        # Manually delete all Employee and Picture objects
+        # Manually delete all Employee objects
+        # (This automatically deletes all picture objects)
         Employee.objects.all().delete()

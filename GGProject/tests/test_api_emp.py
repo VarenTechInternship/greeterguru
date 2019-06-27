@@ -3,7 +3,7 @@ from django.core.files import File
 import requests, json, getpass
 
 
-class viewTests(LiveServerTestCase):
+class EmployeeTests(LiveServerTestCase):
 
     # Creates two employee objects
     def create_employees(self):
