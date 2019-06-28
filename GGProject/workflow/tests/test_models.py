@@ -27,7 +27,7 @@ class EmployeeTests(TestCase):
             unknown_photo = 'schematics.png',
             name = 'unknownpic1'
         )
-
+        
 
     #TEST EMPLOYEE MODEL
     #Test that employe goes into db and saves info in correct columns
