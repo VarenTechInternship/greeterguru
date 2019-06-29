@@ -5,8 +5,34 @@
 version: 2
 jobs:
   build:
+    working_directory: ~/GreeterGuru
     docker:
-      - image: circleci/ruby:2.4.1
+      - image: circleci/python:3.7.3
+        environment:
+          PIPENV_VENV_IN_PROJECT: true
+          DATABASE_URL: sqlite:///GGProject/GreeterGuru/db.sqlite3
     steps:
       - checkout
-      - run: echo "A first hello"
+      # - restore_cache: # ensure this step occurs *before* install dependencies
+      #    key: deps10-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+      - run: 
+          command: | # use pipenv to install dependencies
+            source venv/bin/activate
+            sudo python -m pip install -r requirements.txt
+            cd GGProject
+            python manage.py makemigrations
+            python manage.py migrate
+            python manage.py test
+      # - save_cache:
+      #     key: deps10-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+      #     paths:
+      #       - '.venv'
+      #       - '/usr/local/bin'
+      - run:
+          command: |
+            python GGProject/manage.py test
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+          destination: tr1
