@@ -22,7 +22,6 @@ $ pip3 install -r requirements.txt
 
 ## Running the Application
 ```bash
-<<<<<<< HEAD
 $ cd GGProject
 $ python3 manage.py makemigrations #Create Database Tables
 $ python3 manage.py migrate --run-syncdb #Create New Migration File and Inserts Model Data into Database
@@ -43,9 +42,7 @@ $ python3 manage.py makemigrations #Create Tables
 $ python3 manage.py createsuperuser #Create Admin User
 $ python3 manage.py migrate --run-syncdb #Migrate and Put Model Information in Database
 $ python3 manage.py runserver #Run Server
-=======
-$ cd GGProject && python3 manage.py runserver
->>>>>>> 5119aa504a83c3b0cedcf99011eb8a44bc6b6070
+
 ```
 
 ## Directories Overview
@@ -70,8 +67,4 @@ $ cd GGProject && python3 manage.py runserver
 
 **.circleci:** CircleCI directory. Used to automate testing.
 
-<<<<<<< HEAD
 **venv:** Virtual environment.
-=======
-**venv:** Virtual environment.
->>>>>>> 5119aa504a83c3b0cedcf99011eb8a44bc6b6070
