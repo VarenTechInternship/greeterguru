@@ -62,10 +62,7 @@ class Employee(models.Model):
     )
 
     # Date of the last time the employee logged in
-<<<<<<< HEAD
     #format = 'YYYY-MM-DD'
-=======
->>>>>>> 5119aa504a83c3b0cedcf99011eb8a44bc6b6070
     last_login = models.DateField(
         null = True,
         verbose_name = "Last login date"
@@ -75,11 +72,6 @@ class Employee(models.Model):
     def __str__(self):
         return("{} {}".format(self.first_name, self.last_name))
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 5119aa504a83c3b0cedcf99011eb8a44bc6b6070
 # Pictures that belong to an employee
 class Picture(models.Model):
 
@@ -137,11 +129,7 @@ class TempPhoto(models.Model):
         return("{}".format(self.name))
 
 
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 5119aa504a83c3b0cedcf99011eb8a44bc6b6070
 # Automatically generate authentication token for every user
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
