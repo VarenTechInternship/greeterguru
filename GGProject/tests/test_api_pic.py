@@ -6,7 +6,7 @@ import requests as req
 import json
 
 
-# Requires files 300_0.jpg, 300_1.jpg, 500_0.jpg, and 500_1.jpg 
+# Requires files 300_0.jpg, 300_1.jpg, 500_0.jpg, and 500_1.jpg
 # to be located at GreeterGuru/FaceID/TestPics/
 class PictureTests(LiveServerTestCase):
 
@@ -43,7 +43,7 @@ class PictureTests(LiveServerTestCase):
             "emp_permissions":'1',
             "last_login":"2019-06-26",
         }
-        
+
         try:
             response = req.post(url + "employees/", json=data)
             response.raise_for_status()
@@ -53,8 +53,8 @@ class PictureTests(LiveServerTestCase):
 
     # Add picture to a specified employee
     def add_picture(self, emp_ID, pic_name):
-        
-        url = str(self.live_server_url) + "/api/"       
+
+        url = str(self.live_server_url) + "/api/"
 
         files = {"file" : open(pic_name, 'rb')}
         try:
@@ -63,7 +63,7 @@ class PictureTests(LiveServerTestCase):
         except req.exceptions.HTTPError as err:
             print(err)
 
-            
+
     # Retrieve and display all pictures
     def get_pictures(self):
 
@@ -81,10 +81,10 @@ class PictureTests(LiveServerTestCase):
             for key in picture:
                 print(key + ":", picture[key])
             print()
-                
+
         return response
 
-    
+
     # Retrieve and display all pictures belonging to a given employee
     def get_emp_pictures(self, emp_ID):
 
@@ -102,10 +102,10 @@ class PictureTests(LiveServerTestCase):
             for key in picture:
                 print(key + ":", picture[key])
             print()
-            
+
         return response
 
-    
+
     # Retrieve and display a single picture based on a name
     def get_single_picture(self, name):
 
@@ -122,15 +122,15 @@ class PictureTests(LiveServerTestCase):
         for key in picture:
             print(key + ":", picture[key])
         print()
-            
+
         return response
-    
+
 
     # Update a picture's name
     def update_picture_name(self, old_name, new_name):
-        
+
         url = str(self.live_server_url) + "/api/"
-        
+
         data = {
             "name": new_name,
         }
@@ -142,7 +142,7 @@ class PictureTests(LiveServerTestCase):
             print(err)
 
         return response
-            
+
 
     # Delete a picture with a given name
     def delete_picture(self, name):
@@ -156,16 +156,16 @@ class PictureTests(LiveServerTestCase):
             print(err)
 
         return response
-            
-            
+
+
     # Test all of the Picture API functionalities
     def test_pictures(self):
-        
+
         print()
-        
+
         # Create two employees to add pictures to (emp_ID = 300, 500)
         self.create_employees()
-        # Add two pictures to employee 300 and one to employee 500
+        # Add two pictures to employee 300 and two to employee 500
         self.add_picture(300, MEDIA_ROOT + "TestPics/300_0.jpg")
         self.add_picture(300, MEDIA_ROOT + "TestPics/300_1.jpg")
         self.add_picture(500, MEDIA_ROOT + "TestPics/500_0.jpg")
@@ -204,7 +204,7 @@ class PictureTests(LiveServerTestCase):
         print("ALL PICTURES, AFTER DELETING PICTURE 500_2")
         self.get_pictures()
         print()
-        
+
         # Manually delete all Employee objects
         # (This automatically deletes all picture objects)
         Employee.objects.all().delete()
