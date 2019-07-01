@@ -106,7 +106,8 @@ class EmployeePictures(APIView):
             # Add all necessary attributes
             serializer.validated_data["employee"] = employee
             serializer.validated_data["picture"] = request.FILES['file']
-            serializer.validated_data["name"] = request.FILES['file'].name[:-4]
+            pic_name = request.FILES['file'].name.split(".")[0]
+            serializer.validated_data["name"] = pic_name
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -164,7 +165,8 @@ class ListTempPhotos(APIView):
         if serializer.is_valid():
             # Add all necessary attributes
             serializer.validated_data["unknown_photo"] = request.FILES['file']
-            serializer.validated_data["name"] = request.FILES['file'].name[:-4]
+            pic_name = request.FILES['file'].name.split(".")[0]
+            serializer.validated_data["name"] = pic_name
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
