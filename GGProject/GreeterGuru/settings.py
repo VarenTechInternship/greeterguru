@@ -51,16 +51,22 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_cleanup.apps.CleanupConfig',
     'rest_framework',
+<<<<<<< HEAD:GGProject/GreeterGuru/settings.py
 <<<<<<< HEAD
+=======
+>>>>>>> 5119aa504a83c3b0cedcf99011eb8a44bc6b6070:GGProject/GreeterGuru/settings.py
     'rest_framework.authtoken',
     'rest_auth',
     'workflow',
     'django_popup_view_field',
+<<<<<<< HEAD:GGProject/GreeterGuru/settings.py
 <<<<<<< HEAD
 =======
 >>>>>>> e8f4535... Change settings.py to remove duplicate applicaton names
 =======
 >>>>>>> 7d80eee... Fix authtoken bug
+=======
+>>>>>>> 5119aa504a83c3b0cedcf99011eb8a44bc6b6070:GGProject/GreeterGuru/settings.py
 ]
 
 MIDDLEWARE = [
