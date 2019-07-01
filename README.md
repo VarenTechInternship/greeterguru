@@ -22,7 +22,26 @@ $ pip3 install -r requirements.txt
 
 ## Running the Application
 ```bash
-$ cd GGProject && python3 manage.py runserver
+$ cd GGProject
+$ python3 manage.py makemigrations
+$ python3 manage.py migrate --run-syncdb
+```
+
+#During first login / Create Superuser:
+```bash
+$ python3 manage.py makemigrations
+$ python3 manage.py createsuperuser
+```
+## If needed, flush database & reset migrations
+```bash
+$ cd GGProject
+$ python3 manage.py flush #flushes database
+$ find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+$ find . -path "*/migrations/*.pyc" -delete
+$ python3 manage.py makemigrations
+$ python3 manage.py createsuperuser
+$ python3 manage.py migrate --run-syncdb
+$ python3 manage.py runserver
 ```
 
 ## Directories Overview

@@ -3,6 +3,7 @@ from django.urls import reverse
 from workflow.models import Employee, Picture, TempPhoto
 from django.conf.urls import url
 from workflow import views
+import unittest2
 
 
 class EmployeeTests(TestCase):
