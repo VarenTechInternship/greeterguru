@@ -1,44 +1,27 @@
 # Greeter Guru
 [![CircleCI](https://circleci.com/gh/VarenTechInternship/greeterguru.svg?style=svg)](https://circleci.com/gh/VarenTechInternship/greeterguru)
+
 ## Schematics
 
 ![Schematics](schematics.png)
 
 ## Installation
 
-Updating tools:
+Update tools:
 ```bash
-$ cd ~
-$ sudo apt-get update && sudo apt-get upgrade 
+$ cd ~ && sudo apt-get update && sudo apt-get upgrade 
 ```
 Install image processing and display packages:
 ```bash
-$ sudo apt-get install build-essential cmake unzip pkg-config 
-$ sudo apt-get install libjpeg-dev libpng-dev libtiff-dev 
-$ sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev  
-$ sudo apt-get install libxvidcore-dev libx264-dev 
-$ sudo apt-get install libgtk-3-dev 
-$ sudo apt-get install libatlas-base-dev gfortran 
-$ sudo apt-get install python3-dev python3-testresources
+$ sudo apt-get install -y libjpeg-dev build-essential cmake unzip pkg-config libjpeg-dev libpng-dev libtiff-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libxvidcore-dev libx264-dev libgtk-3-dev libatlas-base-dev gfortran python3-dev python3-testresources
 ```
-Get OpenCV packages:
+Get OpenCV packages and Pip:
 ```bash
-$ cd ~
-$ wget -O opencv.zip https://github.com/opencv/opencv/archive/3.4.4.zip 
-$ wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/3.4.4.zip
-$ unzip opencv.zip && unzip opencv_contrib.zip 
-$ mv opencv-3.4.4 opencv && mv opencv_contrib-3.4.4 opencv_contrib 
+$ cd ~ && wget -O opencv.zip https://github.com/opencv/opencv/archive/3.4.4.zip && wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/3.4.4.zip && unzip opencv.zip && unzip opencv_contrib.zip && mv opencv-3.4.4 opencv && mv opencv_contrib-3.4.4 opencv_contrib && wget https://bootstrap.pypa.io/get-pip.py && sudo python3 get-pip.py 
 ```
-Install Pip:
-```bash:
-$ wget https://bootstrap.pypa.io/get-pip.py 
-$ sudo python3 get-pip.py 
-```
-Create virtual environment:
+Set up and enter virtual environment:
 ```bash
-$ sudo pip3 install virtualenv virtualenvwrapper 
-$ sudo rm -rf ~/get-pip.py ~/.cache/pip 
-$ sudo nano ~/.bashrc
+$ sudo pip3 install virtualenv virtualenvwrapper && sudo rm -rf ~/get-pip.py ~/.cache/pip && sudo nano ~/.profile && source ~/.profile && mkvirtualenv cv -p python3 && workon cv
 ```
 Copy and paste the following into the last line of the opened file:
 ```
@@ -47,61 +30,45 @@ export WORKON_HOME=$HOME/.virtualenvs
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 source /usr/local/bin/virtualenvwrapper.sh
 ```
-Enter the virtual machine:
+Install numpy and configure installation - numpy should be listed under the python3 section in the output:
 ```bash
-$ source ~/.bashrc
-$ mkvirtualenv cv -p python3
-$ workon cv
+$ pip install numpy && cd ~/opencv && mkdir build && cd build && cmake -D CMAKE_BUILD_TYPE=RELEASE \
+-D CMAKE_INSTALL_PREFIX=/usr/local \
+-D INSTALL_PYTHON_EXAMPLES=ON \
+-D INSTALL_C_EXAMPLES=OFF \
+-D OPENCV_ENABLE_NONFREE=ON \
+-D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
+-D PYTHON_EXECUTABLE=~/.virtualenvs/cv/bin/python \
+-D BUILD_EXAMPLES=ON ..
 ```
-Configuring and compiling (from now on, (cv) should be displayed before username):
+Increase the SWAP on the Raspberry Pi - in the opened file, set CONF_SWAPSIZE to 2048:
 ```bash
-$ pip install numpy
-$ workon cv
-$ cd ~/opencv
-$ mkdir build && cd build
-$  cmake -D CMAKE_BUILD_TYPE=RELEASE \
-	-D CMAKE_INSTALL_PREFIX=/usr/local \
-	-D INSTALL_PYTHON_EXAMPLES=ON \
-	-D INSTALL_C_EXAMPLES=OFF \
-	-D OPENCV_ENABLE_NONFREE=ON \
-	-D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
-	-D PYTHON_EXECUTABLE=~/.virtualenvs/cv/bin/python \
-	-D BUILD_EXAMPLES=ON ..
+$ sudo nano /etc/dphys-swapfile && sudo /etc/init.d/dphys-swapfile stop && sudo /etc/init.d/dphys-swapfile start
 ```
-Install OpenCV 4 (this will take about 30 minutes):
+Compile and install OpenCV 4 - this will take about 45 minutes:
 ```bash
-$ make -j4
+$ make -j4 && sudo make install && sudo ldconfig
 ```
-Verify OpenCV version - output should show "3.4.4":
+Reset the SWAP on the Raspberry Pi - in the opened file, set CONF_SWAPSIZE back to 100:
 ```bash
-$ sudo make install && sudo ldconfig
-$ pkg-config --modversion opencv
+$ sudo nano /etc/dphys-swapfile && sudo /etc/init.d/dphys-swapfile stop && sudo /etc/init.d/dphys-swapfile start
 ```
-Verify Python version - output should show "cv2.cpython-36m-x86_64-linux-gnu.so":
+Link OpenCV to Python virtual environment:
 ```bash
-$ ls /usr/local/python/cv2/python-3.6
+$ cd ~/.virtualenvs/cv/lib/python3.5/site-packages/ && ln -s /usr/local/python/cv2/python-3.5/cv2.cpython-35m-arm-linux-gnueabihf.so cv2.so && cd ~
 ```
-Relocate necessary files:
+Verify the new installation in python interpreter - should display “3.4.4”:
 ```bash
-$ cd /usr/local/python/cv2/python-3.6
-$ sudo mv cv2.cpython-36m-x86_64-linux-gnu.so cv2.so
-$ cd ~/.virtualenvs/cv/lib/python3.6/site-packages/
-$ ln -s /usr/local/python/cv2/python-3.6/cv2.so cv2.so
-```
-Test installation:
-```bash
-$ cd ~
-$ workon cv
 $ python
 ```
-Verify installation - should print "3.4.4"
 ```python
-import cv2
-cv2.__version__ 
+>>> import cv2
+>>> cv2.__version__ 
+>>> exit()
 ```
-Install packages with requirements:
+Install required packages in virtual environment:
 ```bash
-pip3 install -r requirements.txt
+$ pip3 install -r requirements.txt
 ```
 
 ## Running the Application
