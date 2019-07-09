@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import url
-from django.contrib.auth.views import login
+import django.contrib.auth.views
 from django.urls import path
 from . import views
 from rest_framework.authtoken import views as authviews
