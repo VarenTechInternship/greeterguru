@@ -71,7 +71,7 @@ def verify(response):
 def main():
     
    create_employee()
-   verify()
+   verify(True)
    display_employees()
 
     
