@@ -19,6 +19,10 @@ Execute second part of installation - there is a prompt at the beginning, and th
 ```bash
 $ bin/install-2.sh
 ```
+NOTE: To uninstall OpenCV and the virtual environment, simply run the command below - this may be necessary if the installation process fails partway through
+```bash
+$ bin/uninstall.sh
+```
 
 ## Running the Application
 ```bash
