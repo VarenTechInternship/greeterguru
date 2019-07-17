@@ -29,7 +29,6 @@ face_detector = cv2.CascadeClassifier('Cascades/haarcascade_frontalface_default.
 def readPhotoRegister():
     
     global photoRegister
-    photoRegister = readPhotoRegister()
 
     photoNames = open("photoNames.txt", "r")
     photoRegister = photoNames.readlines()
