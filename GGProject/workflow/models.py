@@ -1,50 +1,63 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
 
+# Employee class acting as a custom User class
+class Employee(AbstractUser):
 
-# Registered employee
-class Employee(models.Model):
+    # Information about the entire class
+    class Meta:
+        verbose_name = "Employee"
 
-    # First name of the employee
-    first_name = models.CharField(
-        null = True,
-        max_length = 30
+    """
+    Built in User attributes:
+     - username (required): login name, formatted as last name + first initial
+     - password (required): login password, hashed
+     - is_active: is the user still active?
+     - is_staff: is the user allowed to access the site?
+     - is_superuser: is the user an admin?
+     - first_name: first name
+     - last_name: last name
+     - email: valid email address
+    """
+
+    # Whether the user is still active
+    is_active = models.BooleanField(
+        default = True,
+        verbose_name = "Active",
+        help_text = "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
     )
 
-    # Last name of the employee
-    last_name = models.CharField(
-        null = True,
-        max_length = 30
+    # Whether the user can access the site
+    is_staff = models.BooleanField(
+        default = True,
+        verbose_name = "Staff status",
+        help_text = "Designates whether the user can log into this admin site."
+    )
+
+    # Employee's company email address
+    email = models.EmailField(
+        verbose_name = "Company email",
+        help_text = "Required. Company email address in the format email@example.com."
     )
 
     # Employee's ID number that must be unique
-    emp_ID = models.IntegerField(
-        null = True,
+    emp_ID = models.PositiveSmallIntegerField(
         unique = True,
-        verbose_name = "Employee ID"
-    )
-
-    # Employee's email
-    emp_email = models.EmailField(
         null = True,
-        max_length = 254,
-        verbose_name = "Employee email"
-    )
-
-    # Employee's manager's email
-    manager_email = models.EmailField(
-        null = True,
-        max_length = 254
+        verbose_name = "Employee ID",
+        help_text = "Required. Unique integer identifier."
     )
 
     # Employee's keycode number
     keycode = models.PositiveSmallIntegerField(
         null = True,
-        default = 0
+        default = 0,
+        help_text = "Five digit code for accessing building. Used for two-factor authentication."
     )
 
     # Available roles for different types of employees
@@ -54,24 +67,32 @@ class Employee(models.Model):
         ('2', 'Always'),    # 2 can always unlock the door
     )
     # Employee's access permission level
-    emp_permissions = models.CharField(
+    permissions = models.CharField(
         max_length = 15,
         choices = PERMISSIONS_CHOICES,
         default = 0,
-        verbose_name = "Employee permissions"
+        verbose_name = "Access level",
+        help_text = "Designates when the employee is allowed to access the building."
     )
 
-    # Date of the last time the employee logged in
-    last_login = models.DateField(
+    # Date of last login
+    last_login_date = models.DateField(
         null = True,
-        verbose_name = "Last login date"
+        verbose_name = "Last Login Date",
+        help_text = "Date of the last time the employee entered the building."
     )
 
-    # Printing an employee outputs their first and last name
+    # True if user only exists in web database
+    database_only = models.BooleanField(
+        default = False,
+        verbose_name = "Database only",
+        help_text = "Designates whether the user exists only in the web database and not in the active directory. If false while the user is not in active directory, they will be deleted during next database update."
+    )
+
+    # Display Employees as "username (emp_ID)"
     def __str__(self):
-        return("{} {}".format(self.first_name, self.last_name))
-
-
+        return("{} ({})".format(self.username, self.emp_ID))
+    
 
 # Pictures that belong to an employee
 class Picture(models.Model):
@@ -101,10 +122,13 @@ class Picture(models.Model):
         return("{}".format(self.name))
 
 
-
 # Photos belonging to unknown individuals
 class TempPhoto(models.Model):
 
+    # Information about the entire class
+    class Meta:
+        verbose_name = "Unknown Photo"
+    
     # Temporary ID for a stored photo
     temp_id = models.AutoField(
         max_length = 100,
@@ -130,7 +154,6 @@ class TempPhoto(models.Model):
         return("{}".format(self.name))
 
 
-    
 # Automatically generate authentication token for every user
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
