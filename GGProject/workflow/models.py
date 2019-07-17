@@ -1,44 +1,30 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
 
+# Employee class acting as a custom User class
+class Employee(AbstractUser):
 
-# Registered employee
-class Employee(models.Model):
-
-    # First name of the employee
-    first_name = models.CharField(
-        null = True,
-        max_length = 30
-    )
-
-    # Last name of the employee
-    last_name = models.CharField(
-        null = True,
-        max_length = 30
-    )
-
+    """
+    Built in User attributes:
+     - username (required): login name, formatted as last name + first initial
+     - password (required): login password, hashed
+     - is_superuser: is the user/employee an admin?
+     - is_staff: is the user/employee allowed to access the site?
+     - first_name: first name
+     - last_name: last name
+     - email: valid email address
+    """
+    
     # Employee's ID number that must be unique
     emp_ID = models.IntegerField(
         null = True,
         unique = True,
         verbose_name = "Employee ID"
-    )
-
-    # Employee's email
-    emp_email = models.EmailField(
-        null = True,
-        max_length = 254,
-        verbose_name = "Employee email"
-    )
-
-    # Employee's manager's email
-    manager_email = models.EmailField(
-        null = True,
-        max_length = 254
     )
 
     # Employee's keycode number
@@ -54,25 +40,14 @@ class Employee(models.Model):
         ('2', 'Always'),    # 2 can always unlock the door
     )
     # Employee's access permission level
-    emp_permissions = models.CharField(
+    permissions = models.CharField(
         max_length = 15,
         choices = PERMISSIONS_CHOICES,
         default = 0,
         verbose_name = "Employee permissions"
     )
-
-    # Date of the last time the employee logged in
-    last_login = models.DateField(
-        null = True,
-        verbose_name = "Last login date"
-    )
-
-    # Printing an employee outputs their first and last name
-    def __str__(self):
-        return("{} {}".format(self.first_name, self.last_name))
-
-
-
+    
+    
 # Pictures that belong to an employee
 class Picture(models.Model):
 
@@ -99,7 +74,6 @@ class Picture(models.Model):
     # Printing a picture outputs its shorthand name
     def __str__(self):
         return("{}".format(self.name))
-
 
 
 # Photos belonging to unknown individuals
@@ -130,7 +104,6 @@ class TempPhoto(models.Model):
         return("{}".format(self.name))
 
 
-    
 # Automatically generate authentication token for every user
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):

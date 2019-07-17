@@ -1,20 +1,22 @@
 from rest_framework import serializers
-
 from .models import Employee, Picture, TempPhoto
 
-# Serializer for the employee class
+
+# Serializer for the Employee class
 class EmployeesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = (
+            "username",
+            "password",
+            "is_superuser",
+            "is_staff",
             "first_name",
             "last_name",
+            "email",
             "emp_ID",
-            "emp_email",
-            "manager_email",
             "keycode",
-            "emp_permissions",
-            "last_login"
+            "permissions",
         )
 
 # Serializer for the picture class

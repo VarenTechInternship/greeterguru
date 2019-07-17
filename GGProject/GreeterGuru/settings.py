@@ -42,20 +42,24 @@ INSTALLED_APPS = [
     'admin_tools.theming',
     'admin_tools.menu',
     'admin_tools.dashboard',
-    #'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Local apps
     'django_cleanup.apps.CleanupConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
-    'workflow',
     'django_popup_view_field',
+    'workflow.apps.WorkflowConfig',
 ]
+
+# Used for creating a custom user model
+AUTH_USER_MODEL = 'workflow.Employee'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -112,6 +116,7 @@ DATABASES = {
 TEMPLATE_DIRS = [
     'GreeterGuru/GGProject/GreeterGuru/templates'
 ]
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
