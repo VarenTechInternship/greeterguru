@@ -1,0 +1,68 @@
+{% extends "admin/base.html" %}
+
+{% load i18n %}
+
+
+{% block title %}{{ title }} | {% trans 'Greeter Guru Administration' %}{% endblock %}
+
+
+{% block branding %}
+
+<h1 id="site-name">{% trans 'Greeter Guru Administration'%}</h1>
+
+{% endblock %}
+
+
+{% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<!--Create Styling for Button on Auth Factor Page -->
+<style>
+.button {
+  display: inline-block;
+  padding: 15px 25px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #fff;
+  background-color: #447e9b;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 6px #999;
+}
+
+.button:hover {background-color: #205067}
+
+.button:active {
+  background-color: #205067;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+.radio {
+  font-size: 14px;
+  font-family: "Roboto", "Luicida Grande", "DejaVu Sans", "Bitstream";
+}
+
+</style>
+
+<form>
+  <p style="font-size:18px">Select Preferred Authentication Type:</p>
+  <div>
+    <input class="radio" type="radio" name="authentication" value="One-Factor">One-Factor</input>
+    <input class="radio" type="radio" name="authentication" value="Two-Factor">Two-Factor</input>
+  </div>
+  <br>
+  <div>
+    <button class="button" onclick="myfunction()" id = "update-button">Submit</button>
+  </div>
+</form>
+{% csrf_token %}
+<script type="text/javascript">
+    function myfunction(){
+      // TODO: Write function to call update authentication type
+      alert("Successfully Updated.")
+    }
+</script>
+
+{% endblock %}

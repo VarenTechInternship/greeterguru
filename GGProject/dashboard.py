@@ -68,21 +68,14 @@ class CustomIndexDashboard(Dashboard):
             _('Support'),
             children=[
                 {
-                    'title': _('Update Employee Information'), #update from active directory
-                    'url': 'AD/',
-                    'external': False,
-                    'description': "Update from Varen's Active Directory Account.",
-
-                },
-                {
-                    'title': _('Authentication Options'), #do you want two-factor authentication?
-                    'url': 'authfactor/',
+                    'title': _('Update Employee Information'), #do you want two-factor authentication?
+                    'url': 'api/ad/',
                     'external': False,
                     'description': 'Get Multi-Factor Authentication Options.'
                 },
                 {
-                    'title': _('Add User from Photos'), #add a user from the temporary photo cache / delete photo cache
-                    'url': 'temp_db/',
+                    'title': _('Change Authentication Settings'), #add a user from the temporary photo cache / delete photo cache
+                    'url': 'api/authfactor/',
                     'external': False,
                     'description': 'Add Employee from Photo Cache.'
                 },

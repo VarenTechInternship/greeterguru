@@ -17,4 +17,6 @@ urlpatterns = [
     path('pictures/<str:name>/', views.SinglePicture.as_view()),
     path('temp-photos/', views.ListTempPhotos.as_view(), name="alltempphotos"),
     path('token-auth/', authviews.obtain_auth_token),
+    path('ad/', views.UpdateAD.as_view(), name = 'updatead'),
+    path('authfactor/', views.AuthFactor.as_view(), name = 'authfactor')
 ]
