@@ -19,18 +19,26 @@ class Employee(AbstractUser):
      - last_name: last name
      - email: valid email address
     """
-    
+
+    email = models.EmailField(
+        null = True,
+        verbose_name = "Company email",
+        help_text = "Company email address in the format example@email.com."
+    )
+
     # Employee's ID number that must be unique
-    emp_ID = models.IntegerField(
+    emp_ID = models.PositiveSmallIntegerField(
         null = True,
         unique = True,
-        verbose_name = "Employee ID"
+        verbose_name = "Employee ID",
+        help_text = "Required. Unique integer identifier."
     )
 
     # Employee's keycode number
     keycode = models.PositiveSmallIntegerField(
         null = True,
-        default = 0
+        default = 0,
+        help_text = "Five digit code for accessing building. Used for two-factor authentication."
     )
 
     # Available roles for different types of employees
@@ -44,10 +52,11 @@ class Employee(AbstractUser):
         max_length = 15,
         choices = PERMISSIONS_CHOICES,
         default = 0,
-        verbose_name = "Employee permissions"
+        verbose_name = "Employee permissions",
+        help_text = "Designates when the employee is allowed to access the building."
     )
-    
-    
+
+
 # Pictures that belong to an employee
 class Picture(models.Model):
 
