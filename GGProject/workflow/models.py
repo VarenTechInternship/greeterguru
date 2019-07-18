@@ -106,7 +106,7 @@ class Picture(models.Model):
 
     # Actual image file, stored in GreeterGuru/FaceID/Dataset
     picture = models.ImageField(
-        upload_to = "Dataset/",
+        upload_to = "dataset/",
         null = True
     )
 
