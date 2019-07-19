@@ -34,7 +34,7 @@ class Employee(AbstractUser):
 
     # Whether the user can access the site
     is_staff = models.BooleanField(
-        default = True,
+        default = False,
         verbose_name = "Staff status",
         help_text = "Designates whether the user can log into this admin site."
     )
@@ -126,7 +126,7 @@ class TempPhoto(models.Model):
     # Information about the entire class
     class Meta:
         verbose_name = "Unknown Photo"
-    
+
     # Temporary ID for a stored photo
     temp_id = models.AutoField(
         max_length = 100,
@@ -164,4 +164,3 @@ def make_database_only(sender, instance=None, created=False, **kwargs):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
-

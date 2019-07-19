@@ -17,11 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf.urls import url
+from django.views.generic.base import TemplateView
 
 admin.autodiscover()
 
 urlpatterns = [
-    path('', admin.site.urls),
+    path('', TemplateView.as_view(template_name='user_home.html'), name='home'),
+    path('admin/', admin.site.urls),
     url(r'^admin_tools/', include('admin_tools.urls')),
     re_path('api/', include('workflow.urls')),
+    path('users/', include('django.contrib.auth.urls')),
 ]

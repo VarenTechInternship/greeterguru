@@ -7,6 +7,6 @@ class TestAdmin(unittest.TestCase):
     client = Client()
 
     def test_admin(self): #admin main exists
-        response = self.client.get('/')
+        response = self.client.get('/admin/')
         self.assertEqual(response.status_code, 302)
     
