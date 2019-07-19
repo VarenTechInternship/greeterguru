@@ -19,6 +19,7 @@ from PIL import Image
 
 
 import requests as req
+import io
 import json, getpass
 from django.core.files import File
 # For testing the server is local
@@ -35,31 +36,28 @@ face_detector = cv2.CascadeClassifier('Cascades/haarcascade_frontalface_default.
 # Reads the contents of the photoNames.txt file
 def readPhotoRegister():
     
-    global photoRegister
-
     photoNames = open("photoNames.txt", "r")
-    photoRegister = photoNames.readlines()
+    tempPhotoRegister = photoNames.readlines()
 
-    for i in range(len(photoRegister)):
-        person = photoRegister[i]
+    for i in range(len(tempPhotoRegister)):
+        person = tempPhotoRegister[i]
         person = person.strip().split(",")
-        photoRegister[i] = person
+        tempPhotoRegister[i] = person
 
     photoNames.close()
 
-    return(photoRegister)
+    return(tempPhotoRegister)
  
 
 # Writes new content to the photoNames.txt file
 def writePhotoRegister():
 
     global photoRegister 
-
     photoNames = open("photoNames.txt", "w") 
 
     photoNames.truncate()
 
-    copy = []
+    copy = []	
     for person in photoRegister:
         line = ",".join(person)
         copy.append(line)
@@ -91,26 +89,6 @@ def token():
     # Call whatever request you need and pass the header
     response = req.get(url + "employees/", headers=headers)
     # (All of the following example requests exclude this parameter for simplicity)
-
-
-    
-def addToDatabase():
-    #token()
-    tempPhotos = os.listdir(path='tempDataset') 
-    check = len(tempPhotos) # checks if tempDataset has photos
-
-    if check > 0:
-
-        # loops through and adds photos from tempDataset to Dataset
-        for photo in tempPhotos:
-            empID = photo.split("_")[0]
-            path = open("tempDataset/"+photo, 'rb')
-            files = {"file" : path}
-            response = req.post(url + "pictures/" + str(empID) + "/", files=files)
-            os.system("rm tempDataset/"+photo)
-            path.close()
-
-
 
 
 
@@ -160,10 +138,24 @@ def createEmployee():
             photoNum += 1
 
             newPhotoName = str(empID) + '_' + str(photoNum) + ".jpg" # names photo
-
-            cv2.imwrite("tempDataset/"+newPhotoName, gray[y:y+h,x:x+w]) # for tempDataset/
-
             person.append(newPhotoName.strip(".jpg")) # for txt file
+
+            # Convert captured frame to Image object
+            image = Image.fromarray(gray[y:y+h,x:x+w])
+            # Create bytes/file object
+            imageFile = io.BytesIO()
+            # Convert Image object to bytes/file object
+            image.save(imageFile, "JPEG")
+            imageFile.seek(0)
+
+            # Set file's name
+            imageFile.name = newPhotoName
+            # Create the files object to pass
+            files = {"file" : imageFile}
+            # Post the picture to the proper Employee
+            response = req.post(url + "pictures/" + str(empID) + "/", files=files)
+            
+
 
             cv2.imshow('image', img)
 
@@ -180,7 +172,6 @@ def createEmployee():
 
     photoRegister.append(person)
     writePhotoRegister()
-    addToDatabase() # add to database
     trainDataset()
 
     
@@ -203,7 +194,6 @@ def removeEmployee():
             if delEmpID == extractEmpID:
                 print("Removing Employee ID: "+str(extractEmpID)+" Pictures . . .")
                 for pic in person: 
-                    os.system("rm dataset/"+str(pic)+".jpg")
                     response = req.delete(url + "employees/" + str(extractEmpID) + "/")
                 os.system("rm trainer/trainer.yml")
                 photoRegister.remove(person)
@@ -214,10 +204,13 @@ def removeEmployee():
         if flag == False: 
             print("Employee ID not found!")
 
+
 # Trains images in the dataset, outputs an updated .yml file to the trainer/ directory
 def trainDataset():
 
+    global photoRegister
     photoRegister = readPhotoRegister()
+
     if len(photoRegister)>0:
 
         path = 'dataset'
@@ -253,6 +246,7 @@ def searchFace():
 
     global PhotoRegister
     photoRegister = readPhotoRegister()
+
     if len(photoRegister) > 0:
 
         trainDataset()
@@ -289,11 +283,9 @@ def searchFace():
             for(x,y,w,h) in faces:
 
                 EmpID, confidence = recognizer.predict(gray[y:y+h,x:x+w])
-                name = req.get(url + "employees/" + str(EmpID) + "/first_name")
-                print(name)
                 # Checks confidence threshold  
                 if ((confidence < 100) and (100-confidence)>25):
-                    msg = str(name)
+                    msg = str(EmpID)
                     confidence = "{0}%".format(round(100 - confidence))
                     cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (50,0,0), 3)
                     cv2.putText(img, "EmpID: "+msg, (x+w+25,int(y+(h/2))), font, 1, (255,255,0), 2)
@@ -324,6 +316,7 @@ def searchFace():
 def RegisterShift(photoID):
 
     global photoRegister, frameCount
+    photoRegister = readPhotoRegister()
     maxPhotoAmnt = frameCount # define the number of photos of a single person to be kept 
 
     # FIND FACE, THEN . . . ***
@@ -367,7 +360,7 @@ def main():
         elif action == 4: 
             removeEmployee()
         elif action == 5: 
-            displayEmployees()
+            print(readPhotoRegister())
         elif action == -1:
             print("Exiting Program")
         else: print("\nEnter correct value\n")
