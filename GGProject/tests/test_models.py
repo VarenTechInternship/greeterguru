@@ -9,14 +9,14 @@ import unittest2
 class EmployeeTests(TestCase):
     def setUp(self):
         Employee.objects.create(
+            username = 'username',
+            password = 'password',
             first_name = 'first name',
             last_name = 'last name',
+            email = 'email@gmail.com',
             emp_ID = 1,
-            emp_email = 'email@gmail.com',
-            manager_email = 'manager@gmail.com',
             keycode = 12345,
-            emp_permissions = '0',
-            last_login = '2019-01-01'
+            permissions = '0',
         )
 
         Picture.objects.create(
@@ -35,69 +35,75 @@ class EmployeeTests(TestCase):
     #TEST EMPLOYEE MODEL
     #Test that employe goes into db and saves info in correct columns
     def test_employee_content(self):
+
         response = self.client.get(reverse('employees'))
         employee = Employee.objects.get(emp_ID = 1)
 
+        expected_object_uname = f'{employee.username}'
+        self.assertEqual(expected_object_uname, 'username')
+        
+        expected_object_pword = f'{employee.password}'
+        self.assertEqual(expected_object_pword, 'password')
+
         expected_object_fname = f'{employee.first_name}'
         self.assertEqual(expected_object_fname, 'first name')
-
+        
         expected_object_lname = f'{employee.last_name}'
         self.assertEqual(expected_object_lname, 'last name')
+
+        expected_object_email = f'{employee.email}'
+        self.assertEqual(expected_object_email, 'email@gmail.com')
 
         expected_object_empid = f'{employee.emp_ID}'
         self.assertEqual(expected_object_empid, '1')
 
-        expected_object_email = f'{employee.emp_email}'
-        self.assertEqual(expected_object_email, 'email@gmail.com')
-
-        expected_object_manageremail = f'{employee.manager_email}'
-        self.assertEqual(expected_object_manageremail, 'manager@gmail.com')
-
         expected_object_keycode = f'{employee.keycode}'
         self.assertEqual(expected_object_keycode, '12345')
 
-        expected_object_permissions = f'{employee.emp_permissions}'
+        expected_object_permissions = f'{employee.permissions}'
         self.assertEqual(expected_object_permissions, '0')
 
-        expected_object_lastlogin = f'{employee.last_login}'
-        self.assertEqual(expected_object_lastlogin, '2019-01-01')
-
+        
     #test that employee info shows up on employee single view
     def test_single_emp_view(self):
         employee = Employee.objects.get(emp_ID = 1)
         response = self.client.get('/employees/1/')
 
-        expected_fname = f'{employee.first_name}'
-        self.assertEqual(expected_fname, 'first name')
+        expected_object_uname = f'{employee.username}'
+        self.assertEqual(expected_object_uname, 'username')
+        
+        expected_object_pword = f'{employee.password}'
+        self.assertEqual(expected_object_pword, 'password')
 
-        expected_lname = f'{employee.last_name}'
-        self.assertEqual(expected_lname, 'last name')
+        expected_object_fname = f'{employee.first_name}'
+        self.assertEqual(expected_object_fname, 'first name')
+        
+        expected_object_lname = f'{employee.last_name}'
+        self.assertEqual(expected_object_lname, 'last name')
+
+        expected_object_email = f'{employee.email}'
+        self.assertEqual(expected_object_email, 'email@gmail.com')
 
         expected_object_empid = f'{employee.emp_ID}'
         self.assertEqual(expected_object_empid, '1')
 
-        expected_object_email = f'{employee.emp_email}'
-        self.assertEqual(expected_object_email, 'email@gmail.com')
-
-        expected_object_manageremail = f'{employee.manager_email}'
-        self.assertEqual(expected_object_manageremail, 'manager@gmail.com')
-
         expected_object_keycode = f'{employee.keycode}'
         self.assertEqual(expected_object_keycode, '12345')
 
-        expected_object_permissions = f'{employee.emp_permissions}'
+        expected_object_permissions = f'{employee.permissions}'
         self.assertEqual(expected_object_permissions, '0')
 
-        expected_object_lastlogin = f'{employee.last_login}'
-        self.assertEqual(expected_object_lastlogin, '2019-01-01')
 
     #test that all information shows up on all employees view
     def test_all_emp_view(self):
         response = self.client.get(reverse('employees'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'first name' and 'last name' and '1' and
-        'email@gmail.com' and 'manager@gmail.com' and '12345' and '0' and '2019-01-01')
+        self.assertContains(response, 'username' and 'password' and
+                            'first name' and 'last name' and '1' and
+                            'email@gmail.com' and 'manager@gmail.com' and
+                            '12345' and '0')
+
 
     #TEST PICTURE MODEL
     #test that picture saved under employee id has the correct information
