@@ -1,4 +1,4 @@
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -52,15 +52,6 @@ class SingleEmployee(APIView):
         employee = self.get_employee(emp_ID)
         serializer = EmployeesSerializer(employee)
         return Response(serializer.data)
-
-    # Update the retrieved employee
-    def put(self, request, emp_ID, format=None):
-        employee = self.get_employee(emp_ID)
-        serializer = EmployeesSerializer(employee, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # Delete retrieved employee
     def delete(self, request, emp_ID, format=None):

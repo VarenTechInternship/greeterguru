@@ -10,45 +10,35 @@ import json
 # to be located at GreeterGuru/FaceID/TestPics/
 class PictureTests(LiveServerTestCase):
 
-    # Creates two employee objects
-    def create_employees(self):
+    # Create employee object with passed data
+    def create_employee(
+        self,
+        username,
+        password,
+        first_name,
+        last_name,
+        email,
+        emp_ID,
+        keycode,
+        permissions,
+    ):
 
         url = str(self.live_server_url) + "/api/"
 
         data = {
-            "first_name":"Kendall",
-            "last_name":"Kempton",
-            "emp_ID":500,
-            "emp_email":"kemptonk@varentech.com",
-            "manager_email":"parksw@varentech.com",
-            "keycode":12345,
-            "emp_permissions":'1',
-            "last_login":"2019-06-26",
+            "username":username,
+            "password":password,
+            "first_name":first_name,
+            "last_name":last_name,
+            "email":email,
+            "emp_ID":emp_ID,
+            "keycode":keycode,
+            "permissions":permissions,
         }
 
-        try:
-            response = req.post(url + "employees/", json=data)
-            response.raise_for_status()
-        except req.exceptions.HTTPError as err:
-            print(err)
-
-
-        data = {
-            "first_name":"Caroline",
-            "last_name":"Orndorff",
-            "emp_ID":300,
-            "emp_email":"orndorffc@varentech.com",
-            "manager_email":"parksw@varentech.com",
-            "keycode":54321,
-            "emp_permissions":'1',
-            "last_login":"2019-06-26",
-        }
-
-        try:
-            response = req.post(url + "employees/", json=data)
-            response.raise_for_status()
-        except req.exceptions.HTTPError as err:
-            print(err)
+        response = req.post(url + "employees/", json=data)
+        response.raise_for_status()
+        return response.json()
 
 
     # Add picture to a specified employee
@@ -57,73 +47,40 @@ class PictureTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
 
         files = {"file" : open(pic_name, 'rb')}
-        try:
-            response = req.post(url + "pictures/" + str(emp_ID) + "/", files=files)
-            response.raise_for_status()
-        except req.exceptions.HTTPError as err:
-            print(err)
+
+        response = req.post(url + "pictures/" + str(emp_ID) + "/", files=files)
+        response.raise_for_status()
+        return response.json()
 
 
-    # Retrieve and display all pictures
+    # Retrieve all pictures
     def get_pictures(self):
 
         url = str(self.live_server_url) + "/api/"
 
-        try:
-            response = req.get(url + "pictures/")
-            response.raise_for_status()
-        except req.exceptions.HTTPError as err:
-            print(err)
-
-        content = response.json()
-
-        for picture in content:
-            for key in picture:
-                print(key + ":", picture[key])
-            print()
-
-        return response
+        response = req.get(url + "pictures/")
+        response.raise_for_status()
+        return response.json()
 
 
-    # Retrieve and display all pictures belonging to a given employee
+    # Retrieve all pictures belonging to a given employee
     def get_emp_pictures(self, emp_ID):
 
         url = str(self.live_server_url) + "/api/"
 
-        try:
-            response = req.get(url + "pictures/" + str(emp_ID) + "/")
-            response.raise_for_status()
-        except req.exceptions.HTTPError as err:
-            print(err)
-
-        content = response.json()
-
-        for picture in content:
-            for key in picture:
-                print(key + ":", picture[key])
-            print()
-
-        return response
+        response = req.get(url + "pictures/" + str(emp_ID) + "/")
+        response.raise_for_status()
+        return response.json()
 
 
-    # Retrieve and display a single picture based on a name
+    # Retrieve  a single picture based on a name
     def get_single_picture(self, name):
 
         url = str(self.live_server_url) + "/api/"
 
-        try:
-            response = req.get(url + "pictures/" + name + "/")
-            response.raise_for_status()
-        except req.exceptions.HTTPError as err:
-            print(err)
-
-        picture = response.json()
-
-        for key in picture:
-            print(key + ":", picture[key])
-        print()
-
-        return response
+        response = req.get(url + "pictures/" + name + "/")
+        response.raise_for_status()
+        return response.json()
 
 
     # Update a picture's name
@@ -135,13 +92,9 @@ class PictureTests(LiveServerTestCase):
             "name": new_name,
         }
 
-        try:
-            response = req.put(url + "pictures/" + old_name + "/", json=data)
-            response.raise_for_status()
-        except req.exceptions.HTTPError as err:
-            print(err)
-
-        return response
+        response = req.put(url + "pictures/" + old_name + "/", json=data)
+        response.raise_for_status()
+        return response.json()
 
 
     # Delete a picture with a given name
@@ -149,61 +102,77 @@ class PictureTests(LiveServerTestCase):
 
         url = str(self.live_server_url) + "/api/"
 
-        try:
-            response = req.delete(url + "pictures/" + name + "/")
-            response.raise_for_status()
-        except req.exceptions.HTTPError as err:
-            print(err)
-
+        response = req.delete(url + "pictures/" + name + "/")
+        response.raise_for_status()
         return response
 
 
     # Test all of the Picture API functionalities
     def test_pictures(self):
 
-        print()
+        # Create employee 500
+        self.create_employee(
+            username="kemptonk",
+            password="V@r3nTech#",
+            first_name="Kendall",
+            last_name="Kempton",
+            email="kemptonk@varentech.com",
+            emp_ID=500,
+            keycode=12345,
+            permissions="1",
+        )
 
-        # Create two employees to add pictures to (emp_ID = 300, 500)
-        self.create_employees()
+        # Create employee 300
+        self.create_employee(
+            username="orndorffc",
+            password="V@r3nTech#",
+            first_name="Caroline",
+            last_name="Orndorff",
+            email="orndorffc@varentech.com",
+            emp_ID=300,
+            keycode=54321,
+            permissions="2",
+        )
+
         # Add two pictures to employee 300 and two to employee 500
-        self.add_picture(300, MEDIA_ROOT + "TestPics/300_0.jpg")
-        self.add_picture(300, MEDIA_ROOT + "TestPics/300_1.jpg")
-        self.add_picture(500, MEDIA_ROOT + "TestPics/500_0.jpg")
-        self.add_picture(500, MEDIA_ROOT + "TestPics/500_1.jpg")
+        # After each addition, immediately verify the picture was name correctly
+        pic = self.add_picture(300, MEDIA_ROOT + "TestPics/300_0.jpg")
+        self.assertEqual(pic["name"], "300_0")
+        pic = self.add_picture(300, MEDIA_ROOT + "TestPics/300_1.jpg")
+        self.assertEqual(pic["name"], "300_1")
+        pic = self.add_picture(500, MEDIA_ROOT + "TestPics/500_0.jpg")
+        self.assertEqual(pic["name"], "500_0")
+        pic = self.add_picture(500, MEDIA_ROOT + "TestPics/500_1.jpg")
+        self.assertEqual(pic["name"], "500_1")
 
-        # Display all pictures
-        print("ALL PICTURES, INITIAL:")
-        self.get_pictures()
-        print()
-        # Display pictures belonging to employee 300
-        print("EMPLOYEE 500 PICTURES, INITIAL:")
-        self.get_emp_pictures(500)
-        print()
-        # Display picture 300_0
-        print("EMPLOYEE 500 PICTURE 2, INITIAL:")
-        self.get_single_picture("500_1")
-        print()
+        # Verify all pictures were successfully added
+        pic_all = self.get_pictures()
+        self.assertEqual(len(pic_all), 4)
+
+        # Separately retrieve pictures belonging to employees 300 and 500
+        pic_300 = self.get_emp_pictures(300)
+        pic_500 = self.get_emp_pictures(500)
+        # Verify pictures were added to correct employees
+        self.assertEqual(len(pic_300), 2)
+        self.assertEqual(len(pic_500), 2)
+
 
         # Change picture 500_1 to 500_2
-        self.update_picture_name("500_1", "500_2")
-        # Display employee 500 pictures
-        print("EMPLOYEE 500 PICTURES, AFTER CHANGING 500_1 TO 500_2:")
-        self.get_emp_pictures(500)
-        print()
+        pic = self.update_picture_name("500_1", "500_2")
+        # Verify the name change
+        self.assertEqual(pic["name"], "500_2")
+
+        # Delete picture 300_1
+        self.delete_picture("300_1")
+        # Verify the picture was deleted
+        pic_300 = self.get_emp_pictures(300)
+        self.assertEqual(len(pic_300), 1)
 
         # Delete employee 300
-        Employee.objects.get(emp_ID=300).delete()
-        # Display all pictures after deletion
-        print("ALL PICTURES, AFTER DELETING EMPLOYEE 300")
-        self.get_pictures()
-        print()
-
-        # Delete picture 500_2
-        self.delete_picture("500_2")
-        # Display all pictures after deletion
-        print("ALL PICTURES, AFTER DELETING PICTURE 500_2")
-        self.get_pictures()
-        print()
+        Employee.objects.get(emp_ID=500).delete()
+        # Verify all the pictures belonging to them were deleted as well
+        pic_all = self.get_pictures()
+        self.assertEqual(len(pic_all), 1)
 
         # Manually delete all Employee objects
         # (This automatically deletes all picture objects)

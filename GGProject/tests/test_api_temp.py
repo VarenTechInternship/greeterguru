@@ -17,72 +17,51 @@ class TempPhotoTests(LiveServerTestCase):
 
         files = {"file" : open(pic_name, 'rb')}
 
-        try:
-            response = req.post(url + "temp-photos/", files=files)
-            response.raise_for_status()
-        except req.exceptions.HTTPError as err:
-            print(err)
+        response = req.post(url + "temp-photos/", files=files)
+        response.raise_for_status()
+        return response.json()
 
-        return response
-
-
-    # Retrieve and display all temporary photos
+    # Retrieve all temporary photos
     def get_temp_photos(self):
 
         url = str(self.live_server_url) + "/api/"
 
-        try:
-            response = req.get(url + "temp-photos/")
-            response.raise_for_status()
-        except req.exceptions.HTTPError as err:
-            print(err)
+        response = req.get(url + "temp-photos/")
+        response.raise_for_status()
+        return response.json()
 
-        content = response.json()
-
-        for photo in content:
-            for key in photo:
-                print(key + ":", photo[key])
-            print()
-            
-        return response
-    
 
     # Delete all temporary photo objects
     def delete_temp_photos(self):
 
         url = str(self.live_server_url) + "/api/"
-        
-        try:
-            response = req.delete(url + "temp-photos/")
-            response.raise_for_status()
-        except req.exceptions.HTTPError as err:
-            print(err)
-    
+
+        response = req.delete(url + "temp-photos/")
+        response.raise_for_status()
         return response
 
-            
-    # Tests all TempPhoto API functionalities            
+
+    # Tests all TempPhoto API functionalities
     def test_temp_photos(self):
 
-        print()
-        
         # Create three temporary photos
-        self.create_temp_photo(MEDIA_ROOT + "/TestPics/temp1.jpg")
-        self.create_temp_photo(MEDIA_ROOT + "/TestPics/temp2.jpg")
-        self.create_temp_photo(MEDIA_ROOT + "/TestPics/temp3.jpg")
+        # After each addition, immediately verify the picture was name correctly
+        pic = self.create_temp_photo(MEDIA_ROOT + "/TestPics/temp1.jpg")
+        self.assertEqual(pic["name"], "temp1")
+        pic = self.create_temp_photo(MEDIA_ROOT + "/TestPics/temp2.jpg")
+        self.assertEqual(pic["name"], "temp2")
+        pic = self.create_temp_photo(MEDIA_ROOT + "/TestPics/temp3.jpg")
+        self.assertEqual(pic["name"], "temp3")
 
-        # Display all temporary photos
-        print("ALL TEMPORARY PHOTOS, INITIAL:")
-        self.get_temp_photos()
-        print()
+        # Verify all temporary photos were successfully created
+        pic_all = self.get_temp_photos()
+        self.assertEqual(len(pic_all), 3)
 
         # Delete all temporary photos
         self.delete_temp_photos()
-        # Confirm they were deleted
-        if TempPhoto.DoesNotExist:
-            print("ALL TEMP PHOTOS SUCCESSFULLY DELETED")
-        else:
-            print("DELETION OF ALL TEMP PHOTOS FAILED")
-            
+        # Verify all temporary photos were successfully created
+        pic_all = self.get_temp_photos()
+        self.assertEqual(len(pic_all), 0)
+
         # Manually delete all TempPhoto objects
         TempPhoto.objects.all().delete()

@@ -1,20 +1,24 @@
 from rest_framework import serializers
-
 from .models import Employee, Picture, TempPhoto
 
-# Serializer for the employee class
+
+# Serializer for the Employee class
 class EmployeesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = (
+            "username",
+            "is_superuser",
+            "is_staff",
+            "is_active",
             "first_name",
             "last_name",
+            "email",
             "emp_ID",
-            "emp_email",
-            "manager_email",
             "keycode",
-            "emp_permissions",
-            "last_login"
+            "permissions",
+            "database_only",
+            "last_login_date",
         )
 
 # Serializer for the picture class
@@ -24,7 +28,7 @@ class PicturesSerializer(serializers.ModelSerializer):
         fields = (
             'employee',
             'picture',
-            'name'
+            'name',
         )
 
 # Serializer for the temporary photo class
@@ -34,5 +38,5 @@ class TempPhotosSerializer(serializers.ModelSerializer):
         fields = (
             'temp_id',
             'unknown_photo',
-            'name'
+            'name',
         )
