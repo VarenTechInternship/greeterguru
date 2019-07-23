@@ -73,7 +73,7 @@ def token():
     password = getpass.getpass(prompt="Admin Password: ")
     # Create the admin data
     data = {
-        "username": "admin",
+        "username": "Admin",
         "password": password,
     }
     
@@ -283,6 +283,8 @@ def searchFace():
             for(x,y,w,h) in faces:
 
                 EmpID, confidence = recognizer.predict(gray[y:y+h,x:x+w])
+
+
                 # Checks confidence threshold  
                 if ((confidence < 100) and (100-confidence)>25):
                     msg = str(EmpID)
@@ -290,6 +292,22 @@ def searchFace():
                     cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (50,0,0), 3)
                     cv2.putText(img, "EmpID: "+msg, (x+w+25,int(y+(h/2))), font, 1, (255,255,0), 2)
                     cv2.putText(img, "conf: "+str(confidence), (x+w+25,int(y+(h/2))+30), font, .75, (255,255,0), 2)
+
+                    photoName = RegisterShift(EmpID)
+                    response = req.delete(url + "pictures/" + photoName + "/")
+                    # Convert captured frame to Image object
+                    image = Image.fromarray(gray[y:y+h,x:x+w])
+                    imageFile = io.BytesIO()
+                    image.save(imageFile, "JPEG")
+                    imageFile.seek(0)
+                    imageFile.name = photoName
+                    files = {"file" : imageFile}
+                    if photoName != "none":
+                        response = req.post(url + "pictures/" + str(EmpID) + "/", files=files) # add newly captured photo
+                        #response = req.put(url + "pictures/" + photoName + "/", files=files) # add newly captured photo
+                        print("shifting . . .")
+
+
                 else:
                     msg = "Unidentified"
                     confidence = "{0}%".format(round(100 - confidence))
@@ -313,25 +331,30 @@ def searchFace():
 # Takes in photoID to index person
 # Adds new and removes old photos
 # This is used to maintain an updated register of each person's face as they interact with the camera
-def RegisterShift(photoID):
+def RegisterShift(empID):
 
     global photoRegister, frameCount
     photoRegister = readPhotoRegister()
     maxPhotoAmnt = frameCount # define the number of photos of a single person to be kept 
 
-    # FIND FACE, THEN . . . ***
-    person = photoRegister[photoID] # grab the person via photoID
-    temp = person[-1] # copies a person's last picture name
-    person.remove(len(person)) # removes person's last picture name
-    # remove actual photo with name 'person[-1]' --> os.remove("/testDataset/person[-1]")
-    person.insert(0, temp) # inserts copy at front 
-    photoRegister[photoID] = person # re-assign the updated photo names to that person
+    for person in photoRegister:
+        extractEmpID = (person[0].split("_"))[0]
+        #print(extractEmpID)
+        if int(extractEmpID) == empID:
+            
+            tempPic = person[-1] # copies a person's last picture name
+            person.remove(person[-1]) # removes person's last picture name
+            #print("Removing " + str(person[-1]) + " from back")
+            #print("Adding " + tempPic + " to front")
+            person.insert(0, tempPic) # inserts copy at front
+            writePhotoRegister()
 
-    # save new photo with name 'temp' 
-    writePhotoRegister()
-
-
-
+            print(tempPic)
+            return(tempPic)
+            
+        else:
+            print("no match")
+            return("none")
 
 def main():
 
@@ -346,7 +369,7 @@ def main():
             "2. Run operation mode\n", 
             "3. Train Dataset\n", 
             "4. Remove Employee\n",
-            "5. List photo names\n",
+            "5. Register Shift\n",
             "[-1] to QUIT\n") 
 
         action = int(input("Select an action:"))
@@ -360,7 +383,7 @@ def main():
         elif action == 4: 
             removeEmployee()
         elif action == 5: 
-            print(readPhotoRegister())
+            RegisterShift(200)
         elif action == -1:
             print("Exiting Program")
         else: print("\nEnter correct value\n")
