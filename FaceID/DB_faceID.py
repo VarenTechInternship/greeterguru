@@ -73,7 +73,7 @@ def token():
     password = getpass.getpass(prompt="Admin Password: ")
     # Create the admin data
     data = {
-        "username": "jay",
+        "username": "admin",
         "password": password,
     }
     
