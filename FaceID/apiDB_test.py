@@ -41,8 +41,8 @@ def display_employees():
 def create_employee():
     # Define employee data
     data = {
-        "first_name": "Jaylan",
-        "last_name": "Hall",
+        "first_name": "Ayee",
+        "last_name": "Yupp",
         "emp_ID": 400,
         "emp_email": "hallj@varentech.com",
         "manage_email": "parksw@varentech.com",
@@ -71,7 +71,6 @@ def verify(response):
 def main():
     
    create_employee()
-   verify()
    display_employees()
 
     
