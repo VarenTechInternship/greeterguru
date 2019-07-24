@@ -15,10 +15,19 @@ import ldap
 from django_auth_ldap.config import LDAPSearch, NestedActiveDirectoryGroupType
 
 
-# Server name / IP address for Windows Active Directory Virtual Machine
+# URL for the website
+WEB_URL = "http://localhost:8000/"
+
+# Username for the admin user on active directory
+ADMIN_USERNAME = "internship\\Administrator"
+# Password for the previously defined admin user
+ADMIN_PASSWORD = "V@r3nTech#"
+
+# Name / IP address for Windows Active Directory Virtual Machine
 # Find on AD VM by going into cmd and typing ipconfig
 # REVIEW: Will need to change to Web Address
-SERVER = "ldap://192.168.200.128:389"
+AD_NAME = "192.168.200.128"
+AD_ADDRESS = "ldap://" + AD_NAME + ":389"
 # Whether TLS should be used
 # Always false until TLS certificate is retrieved and implemented
 USE_TLS = False
@@ -188,11 +197,11 @@ AUTHENTICATION_BACKENDS = [
 # Look for server & log in as "Administrator"
 # REVIEW: Needs to be changed to each person's Windows server address
 
-AUTH_LDAP_SERVER_URI = SERVER
+AUTH_LDAP_SERVER_URI = AD_ADDRESS
 
-AUTH_LDAP_BIND_DN = 'internship\Administrator'
+AUTH_LDAP_BIND_DN = ADMIN_USERNAME
 
-AUTH_LDAP_BIND_PASSWORD = 'V@r3nTech#'
+AUTH_LDAP_BIND_PASSWORD = ADMIN_PASSWORD
 
 # Check User information against Active Directory each time a User logs in
 AUTH_LDAP_ALWAYS_UPDATE_USER = True

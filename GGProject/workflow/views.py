@@ -38,7 +38,7 @@ class ListEmployees(APIView):
 
 
 # API for handling a single employee based on their employee ID
-class SingleEmployee(APIView):
+class SingleEmployeeID(APIView):
 
     permission_classes = authen
 
@@ -62,6 +62,25 @@ class SingleEmployee(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+# API for handling a single employee based on their username
+class SingleEmployeeName(APIView):
+    
+    permission_classes = authen
+
+    # Retrieve employee according to passed employee ID
+    def get_employee(self, username):
+        try:
+            return Employee.objects.get(username=username)
+        except Employee.DoesNotExist:
+            raise Http404
+    
+    # Delete retrieved employee
+    def delete(self, request, username, format=None):
+        employee = self.get_employee(username)
+        employee.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    
 # API for handling all pictures
 class ListPictures(APIView):
 

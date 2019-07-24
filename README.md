@@ -7,7 +7,7 @@
 
 ## Installation
 
-Execute first part of installation - make sure you're in the GreeterGuru directory
+Execute first part of installation - make sure that you're in the GreeterGuru directory
 ```bash
 $ bin/install-1.sh
 ```
@@ -19,7 +19,7 @@ Execute second part of installation - there is a prompt at the beginning, and th
 ```bash
 $ bin/install-2.sh
 ```
-NOTE: To uninstall OpenCV and the virtual environment, simply run the command below - this may be necessary if the installation process fails partway through
+NOTE: To uninstall OpenCV and the virtual environment run the following command - this may be necessary if the installation process fails partway through
 ```bash
 $ bin/uninstall.sh
 ```
@@ -51,6 +51,12 @@ $ python3 manage.py runserver
 ## For password hash issues, remove sqlite database file before resetting migrations
 ```bash
 $ rm -f tmp.db db.sqlite3
+```
+
+## Enable auto-updates for the web database
+Enable and select the frequency of the auto-updates with the following command - make sure that you're in the GreeterGuru directory
+```bash
+$ bin/update.sh
 ```
 
 ## Directories Overview
