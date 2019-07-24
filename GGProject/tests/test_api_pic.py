@@ -156,7 +156,6 @@ class PictureTests(LiveServerTestCase):
         self.assertEqual(len(pic_300), 2)
         self.assertEqual(len(pic_500), 2)
 
-
         # Change picture 500_1 to 500_2
         pic = self.update_picture_name("500_1", "500_2")
         # Verify the name change

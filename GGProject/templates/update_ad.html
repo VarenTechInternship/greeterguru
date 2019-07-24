@@ -42,13 +42,17 @@
 </style>
 
 
-<button class="button" onclick="myfunction()" id = "update-button">Update User Information</button>
+<button class="button" onclick="myfunction()" id = "update-button">Update Employee Information</button>
 {% csrf_token %}
 <script type="text/javascript">
-    function myfunction(){
-      // TODO: Write function to call update from Active Directory
-      alert("Success! Employee Information is Updated.")
-    }
+  function myfunction(){
+    $.ajax({
+      type: "POST",
+      data: { csrfmiddlewaretoken: '{{ csrf_token }}', text: "success" }
+    });
+    alert("Employee information has been updated.");
+    window.location = "http://localhost:8000/workflow/employee/";
+  }
 </script>
 
 {% endblock %}

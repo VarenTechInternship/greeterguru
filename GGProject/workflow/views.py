@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,6 +8,8 @@ from .serializers import EmployeesSerializer, PicturesSerializer, TempPhotosSeri
 from django.views.generic import View
 from django.shortcuts import render
 from django.contrib.auth.models import User
+
+from scripts import adminOptions
 
 # Allows access to anyone - Use for development
 authen = (AllowAny,)
@@ -170,10 +172,16 @@ class ListTempPhotos(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+# View for the admin option to update database from active directory
 class UpdateAD(View):
     def get(self, request):
         return render(request, "update_ad.html")
 
+    def post(self, request):
+        adminOptions.populate()
+        return HttpResponse(status=status.HTTP_202_ACCEPTED)
+
+# View for the admin option to set the authentication level
 class AuthFactor(View):
     def get(self, request):
         return render(request, "auth_options.html")

@@ -18,7 +18,6 @@ class EmployeesSerializer(serializers.ModelSerializer):
             "keycode",
             "permissions",
             "database_only",
-            "last_login_date",
         )
 
 # Serializer for the picture class

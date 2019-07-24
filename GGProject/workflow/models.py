@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
@@ -41,6 +41,7 @@ class Employee(AbstractUser):
 
     # Employee's company email address
     email = models.EmailField(
+        null = True,
         verbose_name = "Company email",
         help_text = "Required. Company email address in the format email@example.com."
     )
@@ -73,13 +74,6 @@ class Employee(AbstractUser):
         default = 0,
         verbose_name = "Access level",
         help_text = "Designates when the employee is allowed to access the building."
-    )
-
-    # Date of last login
-    last_login_date = models.DateField(
-        null = True,
-        verbose_name = "Last Login Date",
-        help_text = "Date of the last time the employee entered the building."
     )
 
     # True if user only exists in web database
@@ -154,8 +148,16 @@ class TempPhoto(models.Model):
         return("{}".format(self.name))
 
 
+# Automatically make every superuser database only
+@receiver(pre_save, sender=settings.AUTH_USER_MODEL)
+def make_database_only(sender, instance=None, created=False, **kwargs):
+    if instance.is_superuser:
+        instance.database_only = True
+
+
 # Automatically generate authentication token for every user
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
