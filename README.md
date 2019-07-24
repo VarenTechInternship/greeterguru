@@ -48,6 +48,11 @@ $ python3 manage.py migrate --run-syncdb
 $ python3 manage.py runserver
 ```
 
+## For password hash issues, remove sqlite database file before resetting migrations
+```bash
+$ rm -f tmp.db db.sqlite3
+```
+
 ## Directories Overview
 
 **FaceID:** Face detection and recognition package. Implements bulk of project's functionality.

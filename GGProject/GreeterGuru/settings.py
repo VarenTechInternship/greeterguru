@@ -11,6 +11,17 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import ldap
+from django_auth_ldap.config import LDAPSearch, NestedActiveDirectoryGroupType
+
+
+# Server name / IP address for Windows Active Directory Virtual Machine
+# Find on AD VM by going into cmd and typing ipconfig
+# REVIEW: Will need to change to Web Address
+SERVER = "ldap://192.168.200.128:389"
+# Whether TLS should be used
+# Always false until TLS certificate is retrieved and implemented
+USE_TLS = False
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -74,7 +85,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'GreeterGuru.urls'
 
-#configure custom admin page scripts
+# Configure custom admin page scripts
 ADMIN_TOOLS_INDEX_DASHBOARD = 'dashboard.CustomIndexDashboard'
 ADMIN_TOOLS_APP_INDEX_DASHBOARD = 'dashboard.CustomAppIndexDashboard'
 ADMIN_TOOLS_MENU = 'menu.CustomMenu'
@@ -136,6 +147,87 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# Logger for Django Auth Backend
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'stream_to_console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler'
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django_auth_ldap': {
+            'handlers': ['stream_to_console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    }
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
+# Validation for LDAPs
+# Look for server & log in as "Administrator"
+# REVIEW: Needs to be changed to each person's Windows server address
+
+AUTH_LDAP_SERVER_URI = SERVER
+
+AUTH_LDAP_BIND_DN = 'internship\Administrator'
+
+AUTH_LDAP_BIND_PASSWORD = 'V@r3nTech#'
+
+# Check User information against Active Directory each time a User logs in
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
+
+# Search for users
+AUTH_LDAP_USER_SEARCH = LDAPSearch("CN=Users,DC=internship,DC=com", ldap.SCOPE_SUBTREE, "(sAMAccountName=%(user)s)")
+
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch("DC=internship,DC=com",ldap.SCOPE_SUBTREE, "(objectCategory=user)")
+
+AUTH_LDAP_GROUP_TYPE = NestedActiveDirectoryGroupType()
+
+AUTH_LDAP_CACHE_GROUPS = True
+
+AUTH_LDAP_GROUP_CACHE_TIMEOUT = 300
+
+# Set connection settings
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    ldap.OPT_DEBUG_LEVEL: 1,
+    ldap.OPT_REFERRALS: 0
+}
+
+# Map Active Directory Users to Employees(AbstractUsers)
+AUTH_LDAP_USER_ATTR_MAP = {
+    'username': 'sAMAccountName',
+    'first_name': 'givenName',
+    'last_name': 'sn',
+    'email': 'mail',
+    'emp_ID': 'employeeID',
+    'keycode': 'employeeNumber',
+}
+
+# Checks that it is connecting over SSL not TLS
+AUTH_LDAP_FIND_GROUP_PERMS = True
+
+AUTH_LDAP_START_TLS = USE_TLS
 
 
 # Settings for REST APIs
