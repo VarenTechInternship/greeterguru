@@ -1,6 +1,7 @@
 from django.http import Http404, HttpResponse
 from rest_framework import status
 from rest_framework.views import APIView
+from django.views.generic import View
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, AllowAny
 from .models import Employee, Picture, TempPhoto
@@ -8,13 +9,33 @@ from .serializers import EmployeesSerializer, PicturesSerializer, TempPhotosSeri
 from django.views.generic import View
 from django.shortcuts import render
 from django.contrib.auth.models import User
-
 from scripts import adminOptions
+
 
 # Allows access to anyone - Use for development
 authen = (AllowAny,)
 # Only allows access to authenticated admins - Use for final implementation
 #authen = (IsAdminUser,)
+
+
+# View for synchronizing web database with active directory
+class UpdateAD(View):
+    
+    def get(self, request):
+        if request.user.is_superuser:
+            return render(request, "update_ad.html")
+        return HttpResponse(status=405)
+
+    def post(self, request):
+        adminOptions.populate()
+        return HttpResponse(status=status.HTTP_202_ACCEPTED)
+
+
+# View for the admin option to set the authentication level
+class AuthFactor(View):
+
+    def get(self, request):
+        return render(request, "auth_options.html")
 
 
 # API for handling all employees
@@ -189,18 +210,3 @@ class ListTempPhotos(APIView):
     def delete(self, request):
         TempPhoto.objects.all().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-# View for the admin option to update database from active directory
-class UpdateAD(View):
-    def get(self, request):
-        return render(request, "update_ad.html")
-
-    def post(self, request):
-        adminOptions.populate()
-        return HttpResponse(status=status.HTTP_202_ACCEPTED)
-
-# View for the admin option to set the authentication level
-class AuthFactor(View):
-    def get(self, request):
-        return render(request, "auth_options.html")

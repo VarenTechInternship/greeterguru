@@ -21,7 +21,7 @@ class EmployeeAdmin(UserAdmin):
         ('User Information', {'fields': ('username', 'password1', 'password2')}),
         ('Personal Information', {'fields': ('first_name', 'last_name')}),
         ('Employee Information', {'fields': ('emp_ID', 'email', 'keycode', 'permissions')}),
-        ('Account Information', {'fields': ('database_only', 'is_active', 'is_staff', 'is_superuser')}),
+        ('Account Information', {'fields': ('database_only', 'is_staff', 'is_superuser')}),
     )
 
     # Fields available when updating an Employee
@@ -29,7 +29,7 @@ class EmployeeAdmin(UserAdmin):
         ('User Information', {'fields': ('username', 'password')}),
         ('Personal Information', {'fields': ('first_name', 'last_name')}),
         ('Employee Information', {'fields': ('emp_ID', 'email', 'keycode', 'permissions')}),
-        ('Account Information', {'fields': ('database_only', 'is_active', 'is_staff', 'is_superuser')}),
+        ('Account Information', {'fields': ('database_only', 'is_staff', 'is_superuser')}),
     )
 
     # Fields examined during search query

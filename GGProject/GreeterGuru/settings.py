@@ -94,6 +94,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'GreeterGuru.urls'
 
+# Where the site automatically redirects to when someone logs in or out
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+
 # Configure custom admin page scripts
 ADMIN_TOOLS_INDEX_DASHBOARD = 'dashboard.CustomIndexDashboard'
 ADMIN_TOOLS_APP_INDEX_DASHBOARD = 'dashboard.CustomAppIndexDashboard'
@@ -102,8 +106,7 @@ ADMIN_TOOLS_MENU = 'menu.CustomMenu'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': False,
         'OPTIONS': {
             'context_processors': [
@@ -116,7 +119,6 @@ TEMPLATES = [
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader',
                 'admin_tools.template_loaders.Loader',
-
             ],
         },
     },
@@ -231,6 +233,7 @@ AUTH_LDAP_USER_ATTR_MAP = {
     'email': 'mail',
     'emp_ID': 'employeeID',
     'keycode': 'employeeNumber',
+    'permissions': 'employeeType',
 }
 
 # Checks that it is connecting over SSL not TLS
