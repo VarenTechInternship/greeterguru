@@ -1,13 +1,14 @@
 import requests as req
 import ldap
 from django_auth_ldap.backend import LDAPBackend
+from GreeterGuru import settings
 
 
 def populate():
 
-    host = "192.168.200.128"		   # Server’s name/IP address
-    username = "internship\\Administrator" # Any user’s login name on the server
-    password  = "V@r3nTech#"		   # The user’s password
+    host = settings.AD_NAME		# AD server’s name/IP address
+    username = settings.ADMIN_USERNAME  # Any admin's username 
+    password = settings.ADMIN_PASSWORD	# The admin’s password
     
     # Connect to active directory and bind as a user
     conn = ldap.initialize("ldap://" + host)
@@ -36,8 +37,9 @@ def populate():
         if user is None:
             raise Exception("No User name {}".format(username))
 
-    url = "http://localhost:8000/api/"
+    # Delete database users that aren't in AD and that aren't database only
+    url = settings.WEB_URL + "api/"
     employees = req.get(url + "employees/").json()
     for emp in employees:
         if emp["username"] not in results and not emp["database_only"]:
-            response = req.delete(url + "employees/" + str(emp["emp_ID"]) + "/")
+            response = req.delete(url + "employees/" + emp["username"] + "/")
