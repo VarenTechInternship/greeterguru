@@ -7,8 +7,6 @@ In order to test, make sure that:
 1. Opencv is successfully installed
 2. Run "source ~/.profile && workon cv" before running program
    --> this puts you in the virtual environment with all necessary tools
-3. Make sure that the USB webcam is connected through the VM (until built-in is figured out)
-3. Ready! 
 """
 
 import cv2
@@ -16,7 +14,8 @@ import os
 import sys
 import numpy as np
 from PIL import Image
-
+from datetime import datetime
+import time
 
 import requests as req
 import io
@@ -25,13 +24,15 @@ from django.core.files import File
 # For testing the server is local
 url = "http://localhost:8000/api/"
 
-
 # GLOBAL VARIABLES
 photoRegister = [] # Stores photo names for each person as a 2D list
 frameCount = 25 # the amount of frames to take and maintain for an employee
+updateFrameCount = 10 # amount of frames to capture and update to a recognized employee
+dayLim = 1 # [HOURS, MINS, SECS] --> the amount of time for the system to wait until updating that employee's photos again
 
 # loads face detection model
 face_detector = cv2.CascadeClassifier('Cascades/haarcascade_frontalface_default.xml')
+
 
 # Reads the contents of the photoNames.txt file
 def readPhotoRegister():
@@ -50,7 +51,7 @@ def readPhotoRegister():
  
 
 # Writes new content to the photoNames.txt file
-def writePhotoRegister():
+def writePhotoRegister():                                                                              
 
     global photoRegister 
     photoNames = open("photoNames.txt", "w") 
@@ -66,11 +67,28 @@ def writePhotoRegister():
     photoNames.close()
 
 
+# records UTC time stamp for an employee
+def recordLastScan(empID):
+
+    global photoRegister
+    photoRegister = readPhotoRegister()
+
+    currentDate = datetime.utcnow().date()
+    stamp = str(currentDate.year) + ":" + str(currentDate.month) + ":" + str(currentDate.day)
+
+    for person in photoRegister:
+        extractEmpID = (person[1].split("_"))[0]
+        if int(extractEmpID) == int(empID):
+            person[0] = stamp
+
+    writePhotoRegister()
+
+
 def token():
 
     # Enter the admin's password
     # (getpass is used so the password doesn't have to be hard-coded into the program)
-    password = getpass.getpass(prompt="Admin Password: ")
+    password = getpass.getpass(prompt = "Admin Password: ")
     # Create the admin data
     data = {
         "username": "Admin",
@@ -78,7 +96,7 @@ def token():
     }
     
     # Call a post request at the extension 'token-auth/' and pass the admin data
-    response = req.post(url + "token-auth/", json=data)
+    response = req.post(url + "token-auth/", json = data)
     # Convert the response to a readable format
     content = response.json()
     # Extract the token
@@ -87,9 +105,8 @@ def token():
     # Create a header for the HTTP request containing the token
     headers = {"Authorization" : "Token " + token}
     # Call whatever request you need and pass the header
-    response = req.get(url + "employees/", headers=headers)
+    response = req.get(url + "employees/", headers = headers)
     # (All of the following example requests exclude this parameter for simplicity)
-
 
 
 # Registers a new employee
@@ -113,7 +130,7 @@ def createEmployee():
         if len(photoRegister) == 0: 
             flag = True
         for person in photoRegister:
-            extractEmpID = (person[0].split("_"))[0]
+            extractEmpID = (person[1].split("_"))[0]
             if extractEmpID == empID:
                 print("Employee already exists")
             else: flag = True
@@ -123,7 +140,7 @@ def createEmployee():
     cam.set(3, 640) # width
     cam.set(4, 480) # height
 
-    person = []
+    person = [':']
     while(True):
     
         # get camera feed in gray
@@ -155,8 +172,6 @@ def createEmployee():
             # Post the picture to the proper Employee
             response = req.post(url + "pictures/" + str(empID) + "/", files=files)
             
-
-
             cv2.imshow('image', img)
 
         k = cv2.waitKey(100) & 0xff # Press 'ESC' for exiting video
@@ -172,9 +187,9 @@ def createEmployee():
 
     photoRegister.append(person)
     writePhotoRegister()
+    recordLastScan(int(empID))
     trainDataset()
-
-    
+  
 
 # Removes the facial recog data and database info of a specified employee
 def removeEmployee():
@@ -189,7 +204,7 @@ def removeEmployee():
         if delEmpID == -1: flag = True
 
         for person in photoRegister:
-            extractEmpID = int(person[0].split("_")[0])
+            extractEmpID = int(person[1].split("_")[0])
         
             if delEmpID == extractEmpID:
                 print("Removing Employee ID: "+str(extractEmpID)+" Pictures . . .")
@@ -211,7 +226,7 @@ def trainDataset():
     global photoRegister
     photoRegister = readPhotoRegister()
 
-    if len(photoRegister)>0:
+    if len(photoRegister) > 0:
 
         path = 'dataset'
         recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -244,13 +259,12 @@ def trainDataset():
 # Detects and identifies registered employee faces
 def searchFace():
 
-    global PhotoRegister
+    global photoRegister
     photoRegister = readPhotoRegister()
 
     if len(photoRegister) > 0:
 
         trainDataset()
-
 
         recognizer = cv2.face.LBPHFaceRecognizer_create()
         recognizer.read('trainer/trainer.yml')
@@ -280,34 +294,54 @@ def searchFace():
                 minSize = (int(minW), int(minH)),
             )
 
-            for(x,y,w,h) in faces:
+            for(x,y,w,h) in faces: # detects face
 
-                EmpID, confidence = recognizer.predict(gray[y:y+h,x:x+w])
-
-
+                EmpID, confidence = recognizer.predict(gray[y:y+h,x:x+w]) # recognizes face
+              
                 # Checks confidence threshold  
-                if ((confidence < 100) and (100-confidence)>25):
+                if ((confidence < 100) and (100-confidence) > 25):
+
                     msg = str(EmpID)
                     confidence = "{0}%".format(round(100 - confidence))
-                    cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (50,0,0), 3)
+                    cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (0,220,0), 3)
                     cv2.putText(img, "EmpID: "+msg, (x+w+25,int(y+(h/2))), font, 1, (255,255,0), 2)
                     cv2.putText(img, "conf: "+str(confidence), (x+w+25,int(y+(h/2))+30), font, .75, (255,255,0), 2)
+         
+                    for person in photoRegister:
+                        extractEmpID = (person[1].split("_"))[0]
 
-                    photoName = RegisterShift(EmpID)
-                    response = req.delete(url + "pictures/" + photoName + "/")
-                    # Convert captured frame to Image object
-                    image = Image.fromarray(gray[y:y+h,x:x+w])
-                    imageFile = io.BytesIO()
-                    image.save(imageFile, "JPEG")
-                    imageFile.seek(0)
-                    imageFile.name = photoName
-                    files = {"file" : imageFile}
-                    if photoName != "none":
-                        response = req.post(url + "pictures/" + str(EmpID) + "/", files=files) # add newly captured photo
-                        #response = req.put(url + "pictures/" + photoName + "/", files=files) # add newly captured photo
-                        print("shifting . . .")
+                        if (int(extractEmpID) == EmpID):
 
+                            lastScan = list(map(int, person[0].split(":")))
+                            getDate = datetime.utcnow().date()
+                            currentDate = [int(getDate.year), int(getDate.month), int(getDate.day)]
 
+                            sameDay = (lastScan == currentDate)
+                            dayDiff = np.abs(currentDate[2] - lastScan[2])
+
+                            print("last scan: ", lastScan)
+                            print("today: ", currentDate)
+
+                            if not sameDay:
+                            
+                                print("UPDATING  . . .")
+                                for i in range(updateFrameCount): # updates employee photos
+
+                                    photoName = RegisterShift(EmpID)
+
+                                    response = req.delete(url + "pictures/" + photoName + "/")
+                                    # Convert captured frame to Image object
+                                    image = Image.fromarray(gray[y:y+h,x:x+w])
+                                    imageFile = io.BytesIO()
+                                    image.save(imageFile, "JPEG")
+                                    imageFile.seek(0)
+                                    imageFile.name = photoName + ".jpg"
+                                    files = {"file" : imageFile}
+                                    if photoName != "none":
+                                        response = req.post(url + "pictures/" + str(EmpID) + "/", files=files) # add newly captured photo
+                                    
+                                recordLastScan(EmpID) # logs last face scan time
+                                
                 else:
                     msg = "Unidentified"
                     confidence = "{0}%".format(round(100 - confidence))
@@ -320,6 +354,7 @@ def searchFace():
             if k == 27:
                 break
         
+
         cam.release()
         cv2.destroyAllWindows()
         return()
@@ -338,23 +373,18 @@ def RegisterShift(empID):
     maxPhotoAmnt = frameCount # define the number of photos of a single person to be kept 
 
     for person in photoRegister:
-        extractEmpID = (person[0].split("_"))[0]
-        #print(extractEmpID)
+        extractEmpID = (person[1].split("_"))[0]
+
         if int(extractEmpID) == empID:
             
             tempPic = person[-1] # copies a person's last picture name
             person.remove(person[-1]) # removes person's last picture name
-            #print("Removing " + str(person[-1]) + " from back")
-            #print("Adding " + tempPic + " to front")
-            person.insert(0, tempPic) # inserts copy at front
+
+            person.insert(1, tempPic) # inserts copy at front
             writePhotoRegister()
 
-            print(tempPic)
             return(tempPic)
-            
-        else:
-            print("no match")
-            return("none")
+    
 
 def main():
 
@@ -383,7 +413,7 @@ def main():
         elif action == 4: 
             removeEmployee()
         elif action == 5: 
-            RegisterShift(200)
+            RegisterShift(300)
         elif action == -1:
             print("Exiting Program")
         else: print("\nEnter correct value\n")
