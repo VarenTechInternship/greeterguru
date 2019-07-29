@@ -3,15 +3,23 @@
 {% block title %}Greeter Guru Home{% endblock %}
 
 {% block content %}
+
 {% if user.is_authenticated and user.is_staff %}
+
   <script>window.location.href = "{% url 'admin:index' %}";</script>
+
 {% elif user.is_authenticated and user.is_staff != true %}
-  <p>Hello {{ user.first_name }} {{ user.last_name }}!</p>
+
+  <p>Hello, {{ user.first_name }} {{ user.last_name }}!</p>
   <p>Employee ID: {{ user.emp_ID }}</p>
-  <p><a href="{% url 'logout' %}">logout</a></p>
+  <p><a href="{% url 'logout' %}">Logout</a></p>
+
 {% else %}
-  <p>You are not logged in</p>
-  <p><a href="{% url 'login' %}">User Login</a></p>
-  <p><a href="{% url 'admin:index'%}">Admin Login</a></p>
+
+  <a href="{% url 'login' %}">User Login</a>
+  <br><br>
+  <a href="{% url 'admin:index'%}">Admin Login</a>
+
 {% endif %}
+
 {% endblock %}

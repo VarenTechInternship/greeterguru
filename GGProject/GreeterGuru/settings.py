@@ -26,7 +26,7 @@ ADMIN_PASSWORD = "V@r3nTech#"
 # Name / IP address for Windows Active Directory Virtual Machine
 # Find on AD VM by going into cmd and typing ipconfig
 # REVIEW: Will need to change to Web Address
-AD_NAME = "192.168.200.128"
+AD_NAME = "192.168.137.128"
 AD_ADDRESS = "ldap://" + AD_NAME + ":389"
 # Whether TLS should be used
 # Always false until TLS certificate is retrieved and implemented

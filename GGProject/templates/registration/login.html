@@ -1,7 +1,15 @@
-<!-- templates/registration/login.html -->
-<h2>Login</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Login</button>
-</form>
+{# Located in PROJECT_PATH/templates/registration/login.html #}
+
+  {% extends "admin/login.html" %}
+
+  {% load i18n %}
+
+  {% block title %}{{ title }} | {% trans 'User Login' %}{% endblock %}
+
+  {% block branding %}
+
+    <p style="font-size:large; transform: translate(-0%,+10%);">User Login</p>
+
+  {% endblock %}
+
+  {% block nav-global %}{% endblock %}
