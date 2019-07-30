@@ -23,22 +23,16 @@ class PictureTests(LiveServerTestCase):
         permissions,
     ):
 
-        url = str(self.live_server_url) + "/api/"
-
-        data = {
-            "username":username,
-            "password":password,
-            "first_name":first_name,
-            "last_name":last_name,
-            "email":email,
-            "emp_ID":emp_ID,
-            "keycode":keycode,
-            "permissions":permissions,
-        }
-
-        response = req.post(url + "employees/", json=data)
-        response.raise_for_status()
-        return response.json()
+                Employee.objects.create(
+            username=username,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            emp_ID=emp_ID,
+            keycode=keycode,
+            permissions=permissions,
+        )
 
 
     # Add picture to a specified employee
@@ -79,20 +73,6 @@ class PictureTests(LiveServerTestCase):
         url = str(self.live_server_url) + "/api/"
 
         response = req.get(url + "pictures/" + name + "/")
-        response.raise_for_status()
-        return response.json()
-
-
-    # Update a picture's name
-    def update_picture_name(self, old_name, new_name):
-
-        url = str(self.live_server_url) + "/api/"
-
-        data = {
-            "name": new_name,
-        }
-
-        response = req.put(url + "pictures/" + old_name + "/", json=data)
         response.raise_for_status()
         return response.json()
 
@@ -155,11 +135,6 @@ class PictureTests(LiveServerTestCase):
         # Verify pictures were added to correct employees
         self.assertEqual(len(pic_300), 2)
         self.assertEqual(len(pic_500), 2)
-
-        # Change picture 500_1 to 500_2
-        pic = self.update_picture_name("500_1", "500_2")
-        # Verify the name change
-        self.assertEqual(pic["name"], "500_2")
 
         # Delete picture 300_1
         self.delete_picture("300_1")

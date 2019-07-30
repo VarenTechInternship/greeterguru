@@ -19,22 +19,16 @@ class EmployeeTests(LiveServerTestCase):
         permissions,
     ):
 
-        url = str(self.live_server_url) + "/api/"
-
-        data = {
-            "username":username,
-            "password":password,
-            "first_name":first_name,
-            "last_name":last_name,
-            "email":email,
-            "emp_ID":emp_ID,
-            "keycode":keycode,
-            "permissions":permissions,
-        }
-
-        response = req.post(url + "employees/", json=data)
-        response.raise_for_status()
-        return response.json()
+        Employee.objects.create(
+            username=username,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            emp_ID=emp_ID,
+            keycode=keycode,
+            permissions=permissions,
+        )
 
 
     # Retrieve all employees
@@ -55,16 +49,6 @@ class EmployeeTests(LiveServerTestCase):
         response = req.get(url + "employees/" + str(emp_ID) + "/")
         response.raise_for_status()
         return response.json()
-
-
-    # Delete single employee
-    def delete_employee(self, emp_ID):
-
-        url = str(self.live_server_url) + "/api/"
-
-        response = req.delete(url + "employees/" + str(emp_ID) + "/")
-        response.raise_for_status()
-        return response
 
 
     # Tests all employee API functionalities
@@ -97,12 +81,6 @@ class EmployeeTests(LiveServerTestCase):
         # Verify the 2 employees were successfully created
         emp_all = self.get_all_employees()
         self.assertEqual(len(emp_all), 2)
-
-        # Delete employee 300
-        self.delete_employee(300)
-        # Verify employee 300 was deleted
-        emps = self.get_all_employees()
-        self.assertEqual(len(emps), 1)
 
         # Manually delete all remaining Employee objects
         Employee.objects.all().delete()
