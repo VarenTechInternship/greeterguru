@@ -16,7 +16,7 @@ from django_auth_ldap.config import LDAPSearch, NestedActiveDirectoryGroupType
 
 
 # URL for the website
-WEB_URL = "http://localhost:8000/"
+WEB_URL = "https://localhost:8000/"
 
 # Username for the admin user on active directory
 ADMIN_USERNAME = "internship\\Administrator"
@@ -27,10 +27,10 @@ ADMIN_PASSWORD = "V@r3nTech#"
 # Find on AD VM by going into cmd and typing ipconfig
 # REVIEW: Will need to change to Web Address
 AD_NAME = "192.168.137.128"
-AD_ADDRESS = "ldap://" + AD_NAME + ":389"
+AD_ADDRESS = "ldaps://" + AD_NAME + ":636"
 # Whether TLS should be used
 # Always false until TLS certificate is retrieved and implemented
-USE_TLS = False
+USE_TLS = True
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -239,7 +239,7 @@ AUTH_LDAP_USER_ATTR_MAP = {
 # Checks that it is connecting over SSL not TLS
 AUTH_LDAP_FIND_GROUP_PERMS = True
 
-AUTH_LDAP_START_TLS = USE_TLS
+#AUTH_LDAP_START_TLS = USE_TLS
 
 
 # Settings for REST APIs

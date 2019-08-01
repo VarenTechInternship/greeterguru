@@ -23,6 +23,12 @@ NOTE: To uninstall OpenCV and the virtual environment run the following command 
 ```bash
 $ bin/uninstall.sh
 ```
+## Creating A Secure LDAPS Connection
+```bash
+$ sudo su   # Switch user to root
+$ sed -i '/TLS_REQCERT never/d' /etc/ldap/ldap.conf # Remove - if exists - secure connection
+$ echo "TLS_REQCERT never" >> /etc/ldap/ldap.conf # Create secure connection via ldap
+```
 
 ## Running the Application
 ```bash
