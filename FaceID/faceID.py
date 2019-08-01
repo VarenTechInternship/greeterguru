@@ -26,8 +26,8 @@ url = "http://localhost:8000/api/"
 
 # GLOBAL VARIABLES
 photoRegister = [] # Stores photo names for each person as a 2D list
-frameCount = 25 # the amount of frames to take and maintain for an employee
-updateFrameCount = 10 # amount of frames to capture and update to a recognized employee
+frameCount = 20 # the amount of frames to take and maintain for an employee
+updateFrameCount = 5 # amount of frames to capture and update to a recognized employee
 dayLim = 1 # [HOURS, MINS, SECS] --> the amount of time for the system to wait until updating that employee's photos again
 
 # loads face detection model
@@ -283,7 +283,11 @@ def searchFace():
 
         print("Press 'ESC' key to exit\n")
 
+        count = 0
+        accuracyList = []
+
         while True:
+            
             ret, img = cam.read()
             gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
             
@@ -296,17 +300,38 @@ def searchFace():
 
             for(x,y,w,h) in faces: # detects face
 
-                EmpID, confidence = recognizer.predict(gray[y:y+h,x:x+w]) # recognizes face
-              
-                # Checks confidence threshold  
-                if ((confidence < 100) and (100-confidence) > 25):
+                EmpID, accuracy = recognizer.predict(gray[y:y+h,x:x+w]) # recognizes face
+                
+                accuracy = round(100 - accuracy)
+                    
+                if (0 < accuracy <= 100):
 
-                    msg = str(EmpID)
-                    confidence = "{0}%".format(round(100 - confidence))
+                    if (count < 10):
+                        accuracyList.append(accuracy)
+                        avgAccuracy = -1
+                        count += 1
+                        print("taking accuracy")
+                    elif (count >= 10):
+                        avgAccuracy = np.average(accuracyList)
+                        print("averaging accuracy", avgAccuracy)
+                        accuracyList = [accuracy] + accuracyList
+                        accuracyList.pop()
+
+                else:
+                    count = 0
+                    accuracyList = []
+                    avgAccuracy = -1
+
+                # Checks accuracy average  
+                if (avgAccuracy > 25):
+
+                    response = req.get(url + "employees/" + str(EmpID) + "/")
+                    name = response.json()['first_name'] + " " + response.json()['last_name'][0] + "."
+
                     cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (0,220,0), 3)
-                    cv2.putText(img, "EmpID: "+msg, (x+w+25,int(y+(h/2))), font, 1, (255,255,0), 2)
-                    cv2.putText(img, "conf: "+str(confidence), (x+w+25,int(y+(h/2))+30), font, .75, (255,255,0), 2)
-         
+                    cv2.putText(img, name, (x+w+25,int(y+(h/2))), font, 1, (255,255,0), 2)
+                    cv2.putText(img, "Accy: "+str(avgAccuracy), (x+w+25,int(y+(h/2))+30), font, .75, (255,255,0), 2)
+
                     for person in photoRegister:
                         extractEmpID = (person[1].split("_"))[0]
 
@@ -319,12 +344,10 @@ def searchFace():
                             sameDay = (lastScan == currentDate)
                             dayDiff = np.abs(currentDate[2] - lastScan[2])
 
-                            print("last scan: ", lastScan)
-                            print("today: ", currentDate)
 
                             if not sameDay:
                             
-                                print("UPDATING  . . .")
+                                print("UPDATING FACES . . .")
                                 for i in range(updateFrameCount): # updates employee photos
 
                                     photoName = RegisterShift(EmpID)
@@ -343,17 +366,14 @@ def searchFace():
                                 recordLastScan(EmpID) # logs last face scan time
                                 
                 else:
-                    msg = "Unidentified"
-                    confidence = "{0}%".format(round(100 - confidence))
-                    cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (0,0,255), 3)
-                    cv2.putText(img, "conf: "+str(confidence), (x+w+25,int(y+(h/2))+30), font, .75, (255,255,255), 2)       
+                    cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (0,0,255), 3) 
+                    cv2.putText(img, "Scanning", (x+w+25,int(y+(h/2))+30), font, .75, (255,255,255), 2) 
                 
             cv2.imshow('camera',img)
             
             k = cv2.waitKey(10) & 0xff # Press 'ESC' for exiting video
             if k == 27:
                 break
-        
 
         cam.release()
         cv2.destroyAllWindows()
@@ -397,23 +417,14 @@ def main():
         print("ACTIONS:\n",
             "1. Register new employee\n", 
             "2. Run operation mode\n", 
-            "3. Train Dataset\n", 
-            "4. Remove Employee\n",
-            "5. Register Shift\n",
             "[-1] to QUIT\n") 
 
         action = int(input("Select an action:"))
 
         if action == 1: 
-            createEmployee()
+            createEmployee() # for test use
         elif action == 2:
             searchFace()
-        elif action == 3: 
-            trainDataset()
-        elif action == 4: 
-            removeEmployee()
-        elif action == 5: 
-            RegisterShift(300)
         elif action == -1:
             print("Exiting Program")
         else: print("\nEnter correct value\n")
