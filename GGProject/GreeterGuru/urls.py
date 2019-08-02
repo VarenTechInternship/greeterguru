@@ -25,6 +25,7 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='user_home.html'), name='home'),
     path('admin/', admin.site.urls),
     url(r'^admin_tools/', include('admin_tools.urls')),
-    re_path('api/', include('workflow.urls')),
-    path('users/', include('django.contrib.auth.urls'), name='userhome'),
+    re_path('tools/', include('workflow.urls')),
+    re_path('api/', include('api.urls')),
+    path('users/', include('django.contrib.auth.urls')),
 ]

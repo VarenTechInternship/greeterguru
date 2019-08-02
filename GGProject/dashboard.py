@@ -58,13 +58,13 @@ class CustomIndexDashboard(Dashboard):
             children=[
                 {
                     'title': _('Update Employee Information'), #add a user from the temporary photo cache / delete photo cache
-                    'url': 'api/ad/',
+                    'url': 'tools/ad/',
                     'external': False,
                     'description': 'Add Employee from Photo Cache.'
                 },
                 {
                     'title': _('Change Authentication Settings'), #do you want two-factor authentication?
-                    'url': 'api/authfactor/',
+                    'url': 'tools/authfactor/',
                     'external': False,
                     'description': 'Get Multi-Factor Authentication Options.'
                 },
