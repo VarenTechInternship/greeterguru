@@ -16,17 +16,21 @@ import numpy as np
 from PIL import Image
 from datetime import datetime
 import time
-
 import requests as req
 import io
-import json, getpass
+import json
 from django.core.files import File
 # For testing the server is local
 url = "http://localhost:8000/api/"
 
+from pad4pi import rpi_gpio
+import I2C_LCD_driver
+sys.path.append(os.path.join(os.environ["GGPATH"], "GGProject"))
+from GreeterGuru import settings
+
 # comment out for ubuntu --> uncomment for raspi
-#from gpiozero import MotionSensor
-#pir = MotionSensor(4)
+from gpiozero import MotionSensor
+pir = MotionSensor(4)
 
 # GLOBAL VARIABLES
 photoRegister = [] # Stores photo names for each person as a 2D list
@@ -36,6 +40,205 @@ dayLim = 1 # [HOURS, MINS, SECS] --> the amount of time for the system to wait u
 
 # loads face detection model
 face_detector = cv2.CascadeClassifier('Cascades/haarcascade_frontalface_default.xml')
+
+# Keypad layout
+KEYPAD = [
+    ["1", "2", "3", "A"],
+    ["4", "5", "6", "B"],
+    ["7", "8", "9", "C"],
+    ["*", "0", "#", "D"]
+]
+COL_PINS = [17, 15, 14, 4]
+ROW_PINS = [24, 22, 27, 18]
+
+# Initialize keypad and register the keypress handler
+factory = rpi_gpio.KeypadFactory()
+keypad = factory.create_keypad(keypad = KEYPAD, row_pins = ROW_PINS, col_pins = COL_PINS)
+
+# Whether the keypad should be accepting input
+acceptInput = False
+# Sequence of input keypresses
+code = ""
+# Variable used to update screen display
+mylcd = I2C_LCD_driver.lcd()
+
+# Retrieve authorization token for api and create header
+data = {"username":"admin", "password":"V@r3nTech#"}
+response = req.post(url + "token-auth/", json=data)
+response.raise_for_status()
+token = response.json()["token"]
+headers = {"Authorization": "Token " + token}
+
+
+# Handler function for the keypad
+def handleKeyPress(key):
+
+    global acceptInput
+    global code
+
+    # Add the pressed key to the code sequence when
+    # input is being accepted
+    if acceptInput and key != "#":
+        print(key)
+        code += key
+
+    # Stop accepting input when the end key is pressed
+    elif acceptInput and key == "#":
+        acceptInput = False
+
+keypad.registerKeyPressHandler(handleKeyPress)
+
+
+# Retrieve input from the keypad
+def getInput(sec):
+
+    global acceptInput
+
+    acceptInput = True
+    endTime = time.time() + sec
+
+    # Allow input to be accepted for sec seconds and
+    # stop when the end key is pressed
+    while acceptInput and time.time() < endTime:
+        pass
+    acceptInput = False
+
+    # Return whether the loop ended because time ran out
+    return (time.time() > endTime)
+
+
+# Retrieves and verifies the keycode
+def getKeycode(response):
+
+    global mylcd
+    global code
+
+    # Retrieve the employee's actual keycode
+    employee = response.json()
+    actualKeycode = employee["keycode"]
+
+    attempts = 0
+    enteredKeycode = -1
+    timeOut = False
+
+    # Accept keycode attempts while the most recently entered one is incorrect,
+    # there have been less than 3 attempts, and the input has not timed out
+    while str(actualKeycode) != enteredKeycode and attempts < 3 and not timeOut:
+
+        attempts += 1
+        mylcd.lcd_display_string("Please enter", 1, 2)
+        mylcd.lcd_display_string("keycode", 2, 4)
+
+        # Allow keycode to be entered and determine whether the input timed out
+        timeOut = getInput(10)
+        enteredKeycode = code
+        code = ""
+        mylcd.lcd_clear()
+
+        # Display if the entered keycode was incorrect
+        if str(actualKeycode) != enteredKeycode and not timeOut:
+            mylcd.lcd_display_string("Incorrect", 1, 3)
+            mylcd.lcd_display_string("keycode", 2, 4)
+            time.sleep(1.2)
+            mylcd.lcd_clear()
+
+    # Display if the input timed out and return error value
+    if timeOut:
+        mylcd.lcd_display_string("Input has", 1, 3)
+        mylcd.lcd_display_string("timed out", 2, 3)
+        time.sleep(1.2)
+        mylcd.lcd_clear()
+        return -1
+    # Display welcome message and return verified emp_ID
+    elif str(actualKeycode) == enteredKeycode:
+        first_name = employee["first_name"]
+        mylcd.lcd_display_string("Welcome", 1, 4)
+        mylcd.lcd_display_string(first_name, 2, (16 - len(first_name)) // 2)
+        return employee["emp_ID"]
+    # Display that there were too many failed attempts and return error value
+    else:
+        mylcd.lcd_display_string("Too many", 1, 4)
+        mylcd.lcd_display_string("failed attempts", 2)
+        time.sleep(1.2)
+        mylcd.lcd_clear()
+        return -1
+
+
+# Retrieves and verifies the emp_ID
+def getEmpID():
+
+    global mylcd
+    global code
+    global url
+    global headers
+
+    attempts = 0
+    response = False
+    timeOut = False
+
+    # Accept keycode attempts while the most recently entered one is incorrect,
+    # there have been less than 3 attempts, and the input has not timed out
+    while not response and attempts < 3 and not timeOut:
+
+        attempts += 1
+        mylcd.lcd_display_string("Please enter", 1, 2)
+        mylcd.lcd_display_string("employee ID", 2, 2)
+
+        # Allow emp_ID to be entered and determine whether the input timed out
+        timeOut = getInput(10)
+        enteredID = code
+        code = ""
+        mylcd.lcd_clear()
+
+        response = req.get(url + "employees/" + str(enteredID) + "/", headers=headers)
+
+        # Display if the entered ID was not found
+        if not response and not timeOut:
+            mylcd.lcd_display_string("Employee ID", 1, 2)
+            mylcd.lcd_display_string("not found", 2, 3)
+            time.sleep(1.2)
+            mylcd.lcd_clear()
+
+
+    # Display if the input timed out and return error value
+    if timeOut:
+        mylcd.lcd_display_string("Input has", 1, 3)
+        mylcd.lcd_display_string("timed out", 2, 3)
+        time.sleep(1.2)
+        mylcd.lcd_clear()
+        return -1
+    # Retrieve and verify keycode if valid ID was input
+    elif response:
+        print("getKeycode")
+        return getKeycode(response)
+    # Display that there were too many failed attempts and return error value
+    else:
+        mylcd.lcd_display_string("Too many", 1, 4)
+        mylcd.lcd_display_string("failed attempts", 2)
+        time.sleep(1.2)
+        mylcd.lcd_clear()
+        return -1
+
+
+# Handles when a detected face is not recognized
+def unrecognizedFace():
+
+    print("Unrecognized Face")
+
+    global mylcd
+
+    # Display that the face was not recognized
+    mylcd.lcd_display_string("Face not", 1, 4)
+    mylcd.lcd_display_string("recognized", 2, 3)
+    time.sleep(1.2)
+    mylcd.lcd_clear()
+
+    # Get employee ID of unrecognized person by having them
+    # enter it and verify it with their keycode
+    result = getEmpID()
+    time.sleep(1)
+    mylcd.lcd_clear()
+    return result
 
 
 # Enter the admin's password
@@ -109,7 +312,7 @@ def recordLastScan(empID):
 
 
 # Registers a new employee
-def createEmployee():
+def createEmployee(empID):
 
     # 1. get employee ID
     # 2. take frames
@@ -117,11 +320,13 @@ def createEmployee():
     # 4. add to dataset/ folder & send to database
 
     global photoRegister
+    global headers
     photoRegister = readPhotoRegister()
 
     global frameCount
     photoNum = 0
 
+    """
     # Manages input for new employee ID
     flag = False
     while flag == False:
@@ -133,6 +338,7 @@ def createEmployee():
             if extractEmpID == empID:
                 print("Employee already exists")
             else: flag = True
+    """
 
     # CAMERA INITIALIZATION
     cam = cv2.VideoCapture(0)
@@ -169,7 +375,7 @@ def createEmployee():
             # Create the files object to pass
             files = {"file" : imageFile}
             # Post the picture to the proper Employee
-            response = req.post(url + "pictures/" + str(empID) + "/", headers = headers, files = files)
+            response = req.post(url + "pictures/" + str(empID) + "/", files=files, headers=headers)
 
             cv2.imshow('image', img)
 
@@ -193,7 +399,8 @@ def createEmployee():
 # Removes the facial recog data and database info of a specified employee
 def removeEmployee():
 
-    global photoRegister, headers
+    global photoRegister
+    global headers
     photoRegister = readPhotoRegister()
     flag = False
 
@@ -208,7 +415,7 @@ def removeEmployee():
             if delEmpID == extractEmpID:
                 print("Removing Employee ID: "+str(extractEmpID)+" Pictures . . .")
                 for pic in person:
-                    response = req.delete(url + "employees/" + str(extractEmpID) + "/", headers = headers)
+                    response = req.delete(url + "employees/" + str(extractEmpID) + "/", headers=headers)
                 os.system("rm trainer/trainer.yml")
                 photoRegister.remove(person)
                 writePhotoRegister()
@@ -258,7 +465,8 @@ def trainDataset():
 # Detects and identifies registered employee faces
 def searchFace():
 
-    global photoRegister, headers
+    global photoRegister
+    global headers
     photoRegister = readPhotoRegister()
 
     if len(photoRegister) > 0:
@@ -326,15 +534,14 @@ def searchFace():
                     accuracyList = []
                     avgAccuracy = -1
 
-                # Checks accuracy average  
+                # Checks accuracy average
                 if (avgAccuracy > accThreshold):
 
-                    if lock == True: # things to run once ! 
+                    if lock == True: # things to run once !
                         print("UNLOCKED")
                         lock = False
-                        
 
-                    response = req.get(url + "employees/" + str(EmpID) + "/", headers = headers)
+                    response = req.get(url + "employees/" + str(EmpID) + "/", headers=headers)
                     name = response.json()['first_name'] + " " + response.json()['last_name'][0] + "."
 
                     cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (0,220,0), 3)
@@ -361,7 +568,7 @@ def searchFace():
 
                                     photoName = RegisterShift(EmpID)
 
-                                    response = req.delete(url + "pictures/" + photoName + "/")
+                                    response = req.delete(url + "pictures/" + photoName + "/", headers=headers)
                                     # Convert captured frame to Image object
                                     image = Image.fromarray(gray[y:y+h,x:x+w])
                                     imageFile = io.BytesIO()
@@ -370,21 +577,49 @@ def searchFace():
                                     imageFile.name = photoName + ".jpg"
                                     files = {"file" : imageFile}
                                     if photoName != "none":
-                                        response = req.post(url + "pictures/" + str(EmpID) + "/", files = files, headers = headers) # add newly captured photo
+                                        response = req.post(url + "pictures/" + str(EmpID) + "/", files=files, headers=headers) # add newly captured photo
 
                                 recordLastScan(EmpID) # logs last face scan time
-                elif (avgAccuracy <= accThreshold):
+
+                else:
 
                     if lock == False: #things to run once !
                         print("LOCKED")
-                        print("* Keypad input --> gets empID and Keycode *")
                         lock = True
+                        employee = unrecognizedFace()
 
+                        # Determine if employee exists in photo register
+                        found = False
+                        for emp in photoRegister:
+                            extractedID = emp[1].split("_")[0]
+                            if extractedID == str(employee):
+                                found = True
+
+                        if found:
+                            #registerShift()
+                            print("UPDATING  . . .")
+                            for i in range(updateFrameCount): # updates employee photos
+
+                                photoName = RegisterShift(EmpID)
+
+                                response = req.delete(url + "pictures/" + photoName + "/")
+                                # Convert captured frame to Image object
+                                image = Image.fromarray(gray[y:y+h,x:x+w])
+                                imageFile = io.BytesIO()
+                                image.save(imageFile, "JPEG")
+                                imageFile.seek(0)
+                                imageFile.name = photoName + ".jpg"
+                                files = {"file" : imageFile}
+                                if photoName != "none":
+                                    response = req.post(url + "pictures/" + str(EmpID) + "/", files=files, headers=headers) # add newly captured photo
+
+                            recordLastScan(EmpID) # logs last face scan time
+                        else:
+                            #initializeEmployee()
+                            createEmployee(employee)
 
                     cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (0,0,255), 3)
                     cv2.putText(img, "Scanning", (x+w+25,int(y+(h/2))+30), font, .75, (255,255,255), 2)
-
-                    #print("* Keypad input --> gets empID and Keycode *")
 
             cv2.imshow('camera',img)
 
@@ -402,7 +637,8 @@ def searchFace():
 # Maintains an updated register of each person's face as they interact with the camera
 def RegisterShift(empID):
 
-    global photoRegister, frameCount
+    global photoRegister
+    global frameCount
     photoRegister = readPhotoRegister()
     maxPhotoAmnt = frameCount # define the number of photos of a single person to be kept
 
@@ -422,9 +658,12 @@ def RegisterShift(empID):
 # Continuoulsy checks PIR sensor for motion
 def proximitySensor():
 
+    global pir
+
     while True:
 
         pir.wait_for_motion()
+        print("PIR ping")
         searchFace()
 
 
