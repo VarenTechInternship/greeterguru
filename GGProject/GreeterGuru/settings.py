@@ -278,4 +278,3 @@ STATIC_URL = '/static/'
     os.path.join(BASE_DIR, 'static'),
 )'''
 STATICFIles_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-STATICFILES_FINDERS: 'django.contrib.staticfiles.finders.AppDirectoriesFinder'
