@@ -24,6 +24,10 @@ from django.core.files import File
 # For testing the server is local
 url = "http://localhost:8000/api/"
 
+# comment out for ubuntu --> uncomment for raspi
+#from gpiozero import MotionSensor
+#pir = MotionSensor(4)
+
 # GLOBAL VARIABLES
 photoRegister = [] # Stores photo names for each person as a 2D list
 frameCount = 20 # the amount of frames to take and maintain for an employee
@@ -34,9 +38,29 @@ dayLim = 1 # [HOURS, MINS, SECS] --> the amount of time for the system to wait u
 face_detector = cv2.CascadeClassifier('Cascades/haarcascade_frontalface_default.xml')
 
 
+# Enter the admin's password
+# (getpass is used so the password doesn't have to be hard-coded into the program)
+username = "admin"
+password = "V@r3nTech#"
+# Create the admin data
+data = {
+    "username": username,
+    "password": password,
+}
+
+# Call a post request at the extension 'token-auth/' and pass the admin data
+response = req.post(url + "token-auth/", json = data)
+# Convert the response to a readable format
+content = response.json()
+# Extract the token
+token = content["token"]
+# Create a header for the HTTP request containing the token
+headers = {"Authorization" : "Token " + token}
+
+
 # Reads the contents of the photoNames.txt file
 def readPhotoRegister():
-    
+
     photoNames = open("photoNames.txt", "r")
     tempPhotoRegister = photoNames.readlines()
 
@@ -48,17 +72,17 @@ def readPhotoRegister():
     photoNames.close()
 
     return(tempPhotoRegister)
- 
+
 
 # Writes new content to the photoNames.txt file
-def writePhotoRegister():                                                                              
+def writePhotoRegister():
 
-    global photoRegister 
-    photoNames = open("photoNames.txt", "w") 
+    global photoRegister
+    photoNames = open("photoNames.txt", "w")
 
     photoNames.truncate()
 
-    copy = []	
+    copy = []
     for person in photoRegister:
         line = ",".join(person)
         copy.append(line)
@@ -84,40 +108,15 @@ def recordLastScan(empID):
     writePhotoRegister()
 
 
-def token():
-
-    # Enter the admin's password
-    # (getpass is used so the password doesn't have to be hard-coded into the program)
-    password = getpass.getpass(prompt = "Admin Password: ")
-    # Create the admin data
-    data = {
-        "username": "Admin",
-        "password": password,
-    }
-    
-    # Call a post request at the extension 'token-auth/' and pass the admin data
-    response = req.post(url + "token-auth/", json = data)
-    # Convert the response to a readable format
-    content = response.json()
-    # Extract the token
-    token = content["token"]
-
-    # Create a header for the HTTP request containing the token
-    headers = {"Authorization" : "Token " + token}
-    # Call whatever request you need and pass the header
-    response = req.get(url + "employees/", headers = headers)
-    # (All of the following example requests exclude this parameter for simplicity)
-
-
 # Registers a new employee
 def createEmployee():
 
     # 1. get employee ID
-    # 2. take frames 
+    # 2. take frames
     # 3. append person to photoRegister --> [employeeID] + [photo#]
     # 4. add to dataset/ folder & send to database
 
-    global photoRegister 
+    global photoRegister
     photoRegister = readPhotoRegister()
 
     global frameCount
@@ -127,7 +126,7 @@ def createEmployee():
     flag = False
     while flag == False:
         empID = input("Enter your EMPLOYEE ID:  ")
-        if len(photoRegister) == 0: 
+        if len(photoRegister) == 0:
             flag = True
         for person in photoRegister:
             extractEmpID = (person[1].split("_"))[0]
@@ -142,7 +141,7 @@ def createEmployee():
 
     person = [':']
     while(True):
-    
+
         # get camera feed in gray
         ret, img = cam.read()
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -170,14 +169,14 @@ def createEmployee():
             # Create the files object to pass
             files = {"file" : imageFile}
             # Post the picture to the proper Employee
-            response = req.post(url + "pictures/" + str(empID) + "/", files=files)
-            
+            response = req.post(url + "pictures/" + str(empID) + "/", headers=headers, files=files)
+
             cv2.imshow('image', img)
 
         k = cv2.waitKey(100) & 0xff # Press 'ESC' for exiting video
         if k == 27: break
 
-        elif photoNum >= frameCount: 
+        elif photoNum >= frameCount:
             print("\nFacial Scan Complete!\n")
             break
 
@@ -189,12 +188,12 @@ def createEmployee():
     writePhotoRegister()
     recordLastScan(int(empID))
     trainDataset()
-  
+
 
 # Removes the facial recog data and database info of a specified employee
 def removeEmployee():
 
-    global photoRegister
+    global photoRegister, headers
     photoRegister = readPhotoRegister()
     flag = False
 
@@ -205,18 +204,18 @@ def removeEmployee():
 
         for person in photoRegister:
             extractEmpID = int(person[1].split("_")[0])
-        
+
             if delEmpID == extractEmpID:
                 print("Removing Employee ID: "+str(extractEmpID)+" Pictures . . .")
-                for pic in person: 
-                    response = req.delete(url + "employees/" + str(extractEmpID) + "/")
+                for pic in person:
+                    response = req.delete(url + "employees/" + str(extractEmpID) + "/", headers=headers)
                 os.system("rm trainer/trainer.yml")
                 photoRegister.remove(person)
                 writePhotoRegister()
                 print("Removed Employee ID: ", extractEmpID, " successfully!\n")
                 flag = True
-    
-        if flag == False: 
+
+        if flag == False:
             print("Employee ID not found!")
 
 
@@ -259,12 +258,10 @@ def trainDataset():
 # Detects and identifies registered employee faces
 def searchFace():
 
-    global photoRegister
+    global photoRegister, headers
     photoRegister = readPhotoRegister()
 
     if len(photoRegister) > 0:
-
-        trainDataset()
 
         recognizer = cv2.face.LBPHFaceRecognizer_create()
         recognizer.read('trainer/trainer.yml')
@@ -285,35 +282,42 @@ def searchFace():
 
         count = 0
         accuracyList = []
+        avgAccuracy = -1
+        accThreshold = 25
+        lock = True
 
-        while True:
-            
+        camWait = 10 # waits this amount of time in seconds to detect a face
+        timeStamp = time.time()
+
+        while (np.abs(int((time.time() - timeStamp))) < camWait):
+
             ret, img = cam.read()
             gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-            
-            faces = faceCascade.detectMultiScale( 
+
+            faces = faceCascade.detectMultiScale(
                 gray,
                 scaleFactor = 1.2,
                 minNeighbors = 5,
                 minSize = (int(minW), int(minH)),
             )
 
+
             for(x,y,w,h) in faces: # detects face
 
+                timeStamp = time.time()
+
                 EmpID, accuracy = recognizer.predict(gray[y:y+h,x:x+w]) # recognizes face
-                
+
                 accuracy = round(100 - accuracy)
-                    
-                if (0 < accuracy <= 100):
+
+                if (accuracy <= 100) and (accuracy > 0):
 
                     if (count < 10):
                         accuracyList.append(accuracy)
                         avgAccuracy = -1
                         count += 1
-                        print("taking accuracy")
                     elif (count >= 10):
                         avgAccuracy = np.average(accuracyList)
-                        print("averaging accuracy", avgAccuracy)
                         accuracyList = [accuracy] + accuracyList
                         accuracyList.pop()
 
@@ -323,9 +327,14 @@ def searchFace():
                     avgAccuracy = -1
 
                 # Checks accuracy average  
-                if (avgAccuracy > 25):
+                if (avgAccuracy > accThreshold):
 
-                    response = req.get(url + "employees/" + str(EmpID) + "/")
+                    if lock == True: # things to run once ! 
+                        print("UNLOCKED")
+                        lock = False
+                        
+
+                    response = req.get(url + "employees/" + str(EmpID) + "/", headers=headers)
                     name = response.json()['first_name'] + " " + response.json()['last_name'][0] + "."
 
                     cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (0,220,0), 3)
@@ -346,8 +355,8 @@ def searchFace():
 
 
                             if not sameDay:
-                            
-                                print("UPDATING FACES . . .")
+
+                                print("UPDATING  . . .")
                                 for i in range(updateFrameCount): # updates employee photos
 
                                     photoName = RegisterShift(EmpID)
@@ -361,16 +370,24 @@ def searchFace():
                                     imageFile.name = photoName + ".jpg"
                                     files = {"file" : imageFile}
                                     if photoName != "none":
-                                        response = req.post(url + "pictures/" + str(EmpID) + "/", files=files) # add newly captured photo
-                                    
+                                        response = req.post(url + "pictures/" + str(EmpID) + "/", files=files, headers=headers) # add newly captured photo
+
                                 recordLastScan(EmpID) # logs last face scan time
-                                
-                else:
-                    cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (0,0,255), 3) 
-                    cv2.putText(img, "Scanning", (x+w+25,int(y+(h/2))+30), font, .75, (255,255,255), 2) 
-                
+                elif (avgAccuracy <= accThreshold):
+
+                    if lock == False: #things to run once !
+                        print("LOCKED")
+                        print("* Keypad input --> gets empID and Keycode *")
+                        lock = True
+
+
+                    cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (0,0,255), 3)
+                    cv2.putText(img, "Scanning", (x+w+25,int(y+(h/2))+30), font, .75, (255,255,255), 2)
+
+                    #print("* Keypad input --> gets empID and Keycode *")
+
             cv2.imshow('camera',img)
-            
+
             k = cv2.waitKey(10) & 0xff # Press 'ESC' for exiting video
             if k == 27:
                 break
@@ -382,21 +399,18 @@ def searchFace():
     else: print("\nNo Registered Employees!\n")
 
 
-# Function still in testing
-# Takes in photoID to index person
-# Adds new and removes old photos
-# This is used to maintain an updated register of each person's face as they interact with the camera
+# Maintains an updated register of each person's face as they interact with the camera
 def RegisterShift(empID):
 
     global photoRegister, frameCount
     photoRegister = readPhotoRegister()
-    maxPhotoAmnt = frameCount # define the number of photos of a single person to be kept 
+    maxPhotoAmnt = frameCount # define the number of photos of a single person to be kept
 
     for person in photoRegister:
         extractEmpID = (person[1].split("_"))[0]
 
         if int(extractEmpID) == empID:
-            
+
             tempPic = person[-1] # copies a person's last picture name
             person.remove(person[-1]) # removes person's last picture name
 
@@ -404,7 +418,15 @@ def RegisterShift(empID):
             writePhotoRegister()
 
             return(tempPic)
-    
+
+# Continuoulsy checks PIR sensor for motion
+def proximitySensor():
+
+    while True:
+
+        pir.wait_for_motion()
+        searchFace()
+
 
 def main():
 
@@ -414,17 +436,20 @@ def main():
     while (action != -1):
 
         # Test action menu
-        print("ACTIONS:\n",
-            "1. Register new employee\n", 
-            "2. Run operation mode\n", 
-            "[-1] to QUIT\n") 
+        print("1. Register new employee\n",
+            "2. searchFace() \n",
+            "3. Run proximity sensor\n"
+            "[-1] to QUIT\n")
 
         action = int(input("Select an action:"))
 
-        if action == 1: 
-            createEmployee() # for test use
+        if action == 1:
+            createEmployee()
         elif action == 2:
+            trainDataset()
             searchFace()
+        elif action == 3:
+            proximitySensor()
         elif action == -1:
             print("Exiting Program")
         else: print("\nEnter correct value\n")
