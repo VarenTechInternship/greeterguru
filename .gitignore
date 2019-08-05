@@ -92,3 +92,7 @@ db.sqlite3
 ###Exclude Migrations###
 GGProject/workflow/migrations
 !GGProject/workflow/migrations/__init__.py
+
+### FaceID ###
+*.yml
+FaceID/dataset
