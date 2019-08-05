@@ -169,7 +169,7 @@ def createEmployee():
             # Create the files object to pass
             files = {"file" : imageFile}
             # Post the picture to the proper Employee
-            response = req.post(url + "pictures/" + str(empID) + "/", headers=headers, files=files)
+            response = req.post(url + "pictures/" + str(empID) + "/", headers = headers, files = files)
 
             cv2.imshow('image', img)
 
@@ -208,7 +208,7 @@ def removeEmployee():
             if delEmpID == extractEmpID:
                 print("Removing Employee ID: "+str(extractEmpID)+" Pictures . . .")
                 for pic in person:
-                    response = req.delete(url + "employees/" + str(extractEmpID) + "/", headers=headers)
+                    response = req.delete(url + "employees/" + str(extractEmpID) + "/", headers = headers)
                 os.system("rm trainer/trainer.yml")
                 photoRegister.remove(person)
                 writePhotoRegister()
@@ -310,7 +310,7 @@ def searchFace():
 
                 accuracy = round(100 - accuracy)
 
-                if (accuracy <= 100) and (accuracy > 0):
+                if (0 < accuracy <= 100):
 
                     if (count < 10):
                         accuracyList.append(accuracy)
@@ -334,7 +334,7 @@ def searchFace():
                         lock = False
                         
 
-                    response = req.get(url + "employees/" + str(EmpID) + "/", headers=headers)
+                    response = req.get(url + "employees/" + str(EmpID) + "/", headers = headers)
                     name = response.json()['first_name'] + " " + response.json()['last_name'][0] + "."
 
                     cv2.circle(img, (int(x+(w/2)),int(y+(h/2))), 108, (0,220,0), 3)
@@ -370,7 +370,7 @@ def searchFace():
                                     imageFile.name = photoName + ".jpg"
                                     files = {"file" : imageFile}
                                     if photoName != "none":
-                                        response = req.post(url + "pictures/" + str(EmpID) + "/", files=files, headers=headers) # add newly captured photo
+                                        response = req.post(url + "pictures/" + str(EmpID) + "/", files = files, headers = headers) # add newly captured photo
 
                                 recordLastScan(EmpID) # logs last face scan time
                 elif (avgAccuracy <= accThreshold):
