@@ -442,15 +442,21 @@ def trainDataset():
             imagePaths = [os.path.join(path,f) for f in os.listdir(path)]
             faceSamples = []
             ids = []
+
             for imagePath in imagePaths:
-                PIL_img = Image.open(imagePath).convert('L')
-                img_numpy = np.array(PIL_img,'uint8')
-                id = int(os.path.split(imagePath)[-1].split("_")[0])
-                print(id)
-                faces = detector.detectMultiScale(img_numpy)
-                for (x,y,w,h) in faces:
-                    faceSamples.append(img_numpy[y:y+h,x:x+w])
-                    ids.append(id)
+                picName = os.path.split(imagePath)[-1] 
+                ext = os.path.split(imagePath)[-1].split(".")[1]
+                
+                if ext == "jpg":
+                    id = int(picName.split("_")[0])
+                    PIL_img = Image.open(imagePath).convert('L')
+                    img_numpy = np.array(PIL_img,'uint8')
+                    faces = detector.detectMultiScale(img_numpy)
+                    print(": ", id)
+                    for (x,y,w,h) in faces:
+                        faceSamples.append(img_numpy[y:y+h,x:x+w])
+                        ids.append(id)
+            print("")
             return faceSamples,ids
 
         print ("\n [INFO] Training faces . . .")
