@@ -19,7 +19,91 @@ from handleUnrecognizedFaces import validateEmployee
 # Import functions used for managing the photo dataset
 import managePhotoDataset as mpd
 
+# Gets average Accuracy of detected faces
+def getAvgAccuracy(accuracy, accuracyList, count): # Compute accuracy average
+    
+    accuracy = round(100 - accuracy)
+    if 0 < accuracy <= 100:
+        if (count < 10):
+            accuracyList.append(accuracy)
+            avgAccuracy = -1
+            count += 1
+        elif (count >= 10):
+            avgAccuracy = np.average(accuracyList)
+            accuracyList = [accuracy] + accuracyList
+            accuracyList.pop()
+    else:
+        count = 0
+        accuracyList = []
+        avgAccuracy = -1
+    
+    return(avgAccuracy, accuracyList, count)
 
+# checks if employee's face data exists
+def employeeExist(empID, photoRegister):
+
+    for person in photoRegister:
+        extractEmpID = person[1].split("_")[0]
+        if (int(extractEmpID) == empID):
+            return(True)
+        else: 
+            return(False)
+
+# initializes or updates employee faces
+def maintainFaces(url, headers, cam, faceCascade, empID, photoRegister, frameCount):
+
+
+    empExist = employeeExist(empID, photoRegister)
+    if not empExist: 
+        person = [':']
+        frameCount = 20
+
+
+    camWait = 5
+    timeStamp = time.time()
+    while (np.abs(int((time.time() - timeStamp))) < camWait):
+
+        ret, img = cam.read()
+        gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        minW = 0.1*cam.get(3)
+        minH = 0.1*cam.get(4)
+        # Face detection tools
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor = 1.2,
+            minNeighbors = 5,
+            minSize = (int(minW), int(minH)),
+        )
+
+        for(x,y,w,h) in faces: # Detect faces
+            timeStamp = time.time()
+            for i in range(frameCount):
+
+                if empExist: # UPDATE Employee face
+                    photoName = mpd.registerShift(empID, frameCount)
+                    response = req.delete(url + "pictures/" + photoName + "/") # delete current photo
+                    print("UPDATING")
+                else:
+                    photoName = str(empID) + '_' + str(i)
+                    person.append(photoName.strip(".jpg"))
+                    print("INITIALIZING")
+
+                # Convert captured frame to bytes/file object
+                image = Image.fromarray(gray[y:y+h,x:x+w])
+                imageFile = io.BytesIO()
+                image.save(imageFile, "JPEG")
+                imageFile.seek(0)
+
+                # Post the picture to the proper Employee in the database
+                imageFile.name = photoName  + ".jpg"
+                files = {"file" : imageFile}
+                response = req.post(url + "pictures/" + str(empID) + "/", files=files, headers=headers) # add newly captured photo
+
+            mpd.recordLastScan(empID)
+            if not empExist:
+                photoRegister.append(person)
+                mpd.writePhotoNames(photoRegister)
+    
 # Trains images in the dataset
 def trainDataset():
 
@@ -153,7 +237,6 @@ def detectFace(url, headers):
     recognizer.read('trainer/trainer.yml')
     cascadePath = "Cascades/haarcascade_frontalface_default.xml"
     faceCascade = cv2.CascadeClassifier(cascadePath);
-    font = cv2.FONT_HERSHEY_SIMPLEX
 
     # Initialize camera
     cam = cv2.VideoCapture(0)
@@ -163,12 +246,9 @@ def detectFace(url, headers):
     minW = 0.1*cam.get(3)
     minH = 0.1*cam.get(4)
 
-    print("Press 'ESC' key to exit\n")
-
     # Initialize variables
     count = 0
     accuracyList = []
-    avgAccuracy = -1
     accThreshold = 25
     lock = True
     camWait = 10 # camera timeout limit in seconds
@@ -190,15 +270,13 @@ def detectFace(url, headers):
             minSize = (int(minW), int(minH)),
         )
 
-        # Detect faces
-        for(x,y,w,h) in faces:
+        for(x,y,w,h) in faces: # Detect faces
 
             timeStamp = time.time()
 
-            # Recognize faces
-            EmpID, accuracy = recognizer.predict(gray[y:y+h,x:x+w])
-
-            # Compute accuracy average
+            empID, accuracy = recognizer.predict(gray[y:y+h,x:x+w]) # Recognize faces
+            #avgAccuracy, accuracyList, count = getAvgAccuracy(accuracy, accuracyList, count)
+            
             accuracy = round(100 - accuracy)
             if 0 < accuracy <= 100:
                 if (count < 10):
@@ -214,16 +292,18 @@ def detectFace(url, headers):
                 accuracyList = []
                 avgAccuracy = -1
 
-            # Accuracy passes threshold
-            if (avgAccuracy > accThreshold):
-
-                # Run once when unlocked
-                if lock == True:
+            if (avgAccuracy > accThreshold): # Accuracy passes threshold
+               
+                if lock == True: # Run once when unlocked
                     print("UNLOCKED")
                     lock = False
 
-                for person in photoRegister:
-                    extractEmpID = person[1].split("_")[0]
+                # Check if employee's last scan is within a day
+                sameDay = (person[0]) == (datetime.now().strftime("%Y:%m:%d"))
+                if not sameDay: 
+                    maintainFaces(url, headers, cam, faceCascade, empID, photoRegister, dailyUpdateFrameCount)
+            
+            elif (avgAccuracy <= accThreshold): # Accuracy does not pass threshold
 
                     if (int(extractEmpID) == EmpID):
 
@@ -300,18 +380,17 @@ def detectFace(url, headers):
 
         # Press 'ESC' for exiting video
         k = cv2.waitKey(10) & 0xff
-        if k == 27:
-            break
+        if k == 27: break
 
     # Stop camera feed
     cam.release()
     cv2.destroyAllWindows()
     return()
 
-
 # Continuously checks PIR sensor for motion
 def senseMotion(pir, url, headers):
 
+    trainDataset()
     # Halt program until motion is detected, then detect faces
     while True:
         pir.wait_for_motion()
