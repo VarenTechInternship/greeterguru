@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
-
+from os import path
 
 # Employee class acting as a custom User class
 class Employee(AbstractUser):
@@ -164,3 +164,50 @@ def make_database_only(sender, instance=None, created=False, **kwargs):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
+
+# Automatically update FaceID/photoNames.txt when an employee is deleted
+@receiver(post_delete, sender=settings.AUTH_USER_MODEL)
+def remove_employee(sender, instance=None, created=False, **kwargs):
+   # Set file path and open photoNames.txt
+   file_path = path.abspath(path.join(settings.MEDIA_ROOT, "photoNames.txt"))
+   f = open(file_path, "r+")
+   # Retrieve lines and move cursor to start of file
+   lines = f.readlines()
+   f.seek(0)
+   for line in lines:
+       # Write each line that doesn't belong to deleted employee
+       if line.split("_")[0] != str(instance.emp_ID):
+           f.write(line)
+   # Remove final line and close file
+   f.truncate()
+   f.close()
+
+
+# Automatically update FaceID/photoNames.txt when a picture is deleted
+@receiver(post_delete, sender=Picture)
+def remove_picture(sender, instance=None, created=False, **kwargs):
+
+   # Set file path and open photoNames.txt
+   file_path = path.abspath(path.join(settings.MEDIA_ROOT, "photoNames.txt"))
+   f = open(file_path, "r+")
+
+   # Retrieve lines and move cursor to start of file
+   lines = f.readlines()
+   f.seek(0)
+   
+   for line in lines:
+       # If picture is in current line, remove it then write the line
+       # Otherwise, just write the line as is
+       if instance.name in line:
+           start = line.find(instance.name)
+           if start != 0:
+               start -= 1
+           end = start + len(instance.name) + 1
+           line = line[:start] + line[end:]
+       if len(line.split(",")) != 1:
+           f.write(line)
+
+   # Remove final line and close file
+   f.truncate()
+   f.close()
