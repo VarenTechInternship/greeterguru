@@ -19,30 +19,35 @@ Execute second part of installation - there is a prompt at the beginning, and th
 ```bash
 $ bin/install-2.sh
 ```
+Set up Active Directory and Web Server automatically
+```bash
+$ bin/setup.sh
+```
 NOTE: To uninstall OpenCV and the virtual environment run the following command - this may be necessary if the installation process fails partway through
 ```bash
 $ bin/uninstall.sh
 ```
-## Creating A Secure LDAPS Connection
+
+## Manually set up Active Directory and Server
+Create A Secure LDAPS Connection
 ```bash
 $ sudo su   # Switch user to root
 $ sed -i '/TLS_REQCERT never/d' /etc/ldap/ldap.conf # Remove - if exists - secure connection
 $ echo "TLS_REQCERT never" >> /etc/ldap/ldap.conf # Create secure connection via ldap
 ```
-
-## Running the Application
+Run the Application
 ```bash
 $ cd GGProject
 $ python3 manage.py makemigrations
 $ python3 manage.py migrate --run-syncdb
 ```
-
-#During first login / Create Superuser:
+Create Superuser:
 ```bash
-$ python3 manage.py makemigrations
 $ python3 manage.py createsuperuser
 ```
-## If needed, flush database & reset migrations
+
+## Troubleshooting manual connections
+To remove all users, flush database & reset migrations
 ```bash
 $ cd GGProject
 $ python3 manage.py flush #flushes database
@@ -53,16 +58,9 @@ $ python3 manage.py createsuperuser
 $ python3 manage.py migrate --run-syncdb
 $ python3 manage.py runserver
 ```
-
-## For password hash issues, remove sqlite database file before resetting migrations
+For password hash issues, remove sqlite database file before resetting migrations
 ```bash
 $ rm -f tmp.db db.sqlite3
-```
-
-## Enable auto-updates for the web database
-Enable and select the frequency of the auto-updates with the following command - make sure that you're in the GreeterGuru directory
-```bash
-$ bin/update.sh
 ```
 
 ## Directories Overview

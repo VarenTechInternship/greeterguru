@@ -7,8 +7,8 @@ from GreeterGuru import settings
 def populate():
 
     host = settings.AD_NAME		# AD server’s name/IP address
-    username = settings.ADMIN_USERNAME  # Any admin's username 
-    password = settings.ADMIN_PASSWORD	# The admin’s password
+    username = settings.AD_USERNAME  # Any admin's username 
+    password = settings.AD_PASSWORD	# The admin’s password
     
     # Connect to active directory and bind as a user
     conn = ldap.initialize("ldap://" + host)

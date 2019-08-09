@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Create environment variable for GreeterGuru project path
+sudo sed -i '/GGPATH=*/d' ~/.profile
+echo "GGPATH=$PWD; export GGPATH" >> ~/.profile
+
 echo "
 UPDATING AND UPGRADING:"
 cd ~

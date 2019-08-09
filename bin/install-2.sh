@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Save GreeterGuru repo location
-path=$(pwd)
-
 echo "
 INSTALLING MOST RECENT VERSION OF NUMPY:"
 while [ "$numpy" != "y" ]; do
@@ -54,7 +51,7 @@ LINKING OPENCV TO PYTHON VIRTUAL ENVIRONMENT:"
 cd ~/.virtualenvs/cv/lib/python3.5/site-packages/
 sudo ln -s /usr/local/python/cv2/python-3.5/cv2.cpython-35m-arm-linux-gnueabihf.so cv2.so
 
-cd $path    # Return to GreeterGuru repo location
+cd $GGPATH    # Return to GreeterGuru repo location
 
 echo "
 VERIFYING INSTALLATION - SHOULD DISPLAY '3.4.4':"
@@ -63,3 +60,4 @@ python3 bin/verify.py
 echo "
 INSTALLING PACKAGES WITH REQUIREMENTS:"
 pip3 install -r requirements.txt
+python3 -m pip install python-ldap

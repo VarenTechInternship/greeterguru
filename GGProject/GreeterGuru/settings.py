@@ -15,32 +15,35 @@ import ldap
 from django_auth_ldap.config import LDAPSearch, NestedActiveDirectoryGroupType
 
 
-# URL for the website
-WEB_URL = "https://localhost:8000/"
+# Address and URL for the website
+WEB_ADDRESS = "localhost:8000"
+WEB_URL = "https://" + WEB_ADDRESS + "/"
 
-# Username for the admin user on active directory
-ADMIN_USERNAME = "internship\\Administrator"
-# Password for the previously defined admin user
-ADMIN_PASSWORD = "V@r3nTech#"
+# Username for the admin user on website
+WEB_USERNAME = "admin"
+
+# Username/password for the admin user on active directory
+AD_USERNAME = ""
+AD_PASSWORD = ""
 
 # Name / IP address for Windows Active Directory Virtual Machine
 # Find on AD VM by going into cmd and typing ipconfig
 # REVIEW: Will need to change to Web Address
-AD_NAME = "192.168.137.128"
+AD_NAME = ""
 AD_ADDRESS = "ldaps://" + AD_NAME + ":636"
+
 # Whether TLS should be used
 # Always false until TLS certificate is retrieved and implemented
 USE_TLS = True
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.join(os.environ["GGPATH"], "GGProject")
 
 STATIC_ROOT = './static'
 SITE_ID = 0
 
 # Path to store media files
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "FaceID/")
+MEDIA_ROOT = os.path.join(os.environ["GGPATH"], "FaceID")
 
 #APPEND_SLASH = False
 
@@ -201,9 +204,9 @@ AUTHENTICATION_BACKENDS = [
 
 AUTH_LDAP_SERVER_URI = AD_ADDRESS
 
-AUTH_LDAP_BIND_DN = ADMIN_USERNAME
+AUTH_LDAP_BIND_DN = AD_USERNAME
 
-AUTH_LDAP_BIND_PASSWORD = ADMIN_PASSWORD
+AUTH_LDAP_BIND_PASSWORD = AD_PASSWORD
 
 # Check User information against Active Directory each time a User logs in
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
