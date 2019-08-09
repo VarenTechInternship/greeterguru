@@ -1,67 +1,61 @@
 # Greeter Guru
+
+Greeter Guru is a "proof of concept" application designed, developed, and deployed by the Varen Technologies 2019 Internship Group. It is smart doorbell using facial recognition that unlocks the office and communicates with Slack to let other employees know that they are in the office and currently at work.
+
 [![CircleCI](https://circleci.com/gh/VarenTechInternship/greeterguru.svg?style=svg)](https://circleci.com/gh/VarenTechInternship/greeterguru)
+
 
 ## Schematics
 
 ![Schematics](schematics.png)
 
+
+## Features
+
+* Detects and recognizes faces at office door to allow entrance to registered employees.
+
+* Admin website for viewing and maintaining registered employees and saved pictures.
+
+* Employee website for viewing any necessary login information.
+
+* Integration with Active Directory to allow automatic employee registration.
+
+
 ## Installation
 
 Execute first part of installation - make sure that you're in the GreeterGuru directory
 ```bash
-$ bin/install-1.sh
+$ sudo bin/install-1.sh
 ```
+
 Manually create and enter virtual environment - after this, (cv) should always be displayed before username
 ```bash
 $ source ~/.profile && mkvirtualenv cv -p python3
 ```
+
 Execute second part of installation - there is a prompt at the beginning, and then you can leave it to finish executing, which will take around 60 minutes
 ```bash
-$ bin/install-2.sh
+$ sudo bin/install-2.sh
 ```
-Set up Active Directory and Web Server automatically
-```bash
-$ bin/setup.sh
-```
+
 NOTE: To uninstall OpenCV and the virtual environment run the following command - this may be necessary if the installation process fails partway through
 ```bash
-$ bin/uninstall.sh
+$ sudo bin/uninstall.sh
 ```
 
-## Manually set up Active Directory and Server
-Create A Secure LDAPS Connection
+
+## How to Use
+
+Set up Active Directory and Web Server
 ```bash
-$ sudo su   # Switch user to root
-$ sed -i '/TLS_REQCERT never/d' /etc/ldap/ldap.conf # Remove - if exists - secure connection
-$ echo "TLS_REQCERT never" >> /etc/ldap/ldap.conf # Create secure connection via ldap
-```
-Run the Application
-```bash
-$ cd GGProject
-$ python3 manage.py makemigrations
-$ python3 manage.py migrate --run-syncdb
-```
-Create Superuser:
-```bash
-$ python3 manage.py createsuperuser
+$ sudo bin/setup.sh
 ```
 
-## Troubleshooting manual connections
-To remove all users, flush database & reset migrations
+Run the application
 ```bash
-$ cd GGProject
-$ python3 manage.py flush #flushes database
-$ find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
-$ find . -path "*/migrations/*.pyc" -delete
-$ python3 manage.py makemigrations
-$ python3 manage.py createsuperuser
-$ python3 manage.py migrate --run-syncdb
-$ python3 manage.py runserver
+$ python3 GreeterGuru.py
 ```
-For password hash issues, remove sqlite database file before resetting migrations
-```bash
-$ rm -f tmp.db db.sqlite3
-```
+
 
 ## Directories Overview
 
@@ -73,15 +67,19 @@ $ rm -f tmp.db db.sqlite3
 
 --> **Trainer:** Results from training the model.
 
-**GGProject:** Root directory of GreeterGuru Django project.
+**GGProject:** Root directory of GreeterGuru website.
 
---> **GreeterGuru:** Django project package.
+--> **GreeterGuru:** Website project package.
 
---> **workflow:** Django application. Handles project workflow.
+--> **workflow:** Web application. Defines database objects.
 
---> **api:** Django application. Implements necessary APIs.
+   --> **management/commands:** Custom commands for web application.
 
---> **scripts:** Additional python scripts for Django project.
+--> **api:** Web application. Implements necessary APIs.
+
+--> **scripts:** Additional python scripts for website.
+
+**bin:** Bash scripts for installing and implementing various parts of the application.
 
 **.circleci:** CircleCI directory. Used to automate testing.
 
