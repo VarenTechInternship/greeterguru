@@ -7,6 +7,7 @@ def readPhotoNames():
     photoNamesFile = open("photoNames.txt", "r")
     photoNames = photoNamesFile.readlines()
 
+    # Read photoNames line by line to array
     for i, photo in enumerate(photoNames):
         photoNames[i] = photo.strip().split(",")
 
@@ -21,6 +22,7 @@ def writePhotoNames(photoRegister):
     photoNamesFile.truncate()
 
     copy = []
+    # Write photoRegister to photoNames line by line
     for person in photoRegister:
         line = ",".join(person)
         copy.append(line)
@@ -62,5 +64,7 @@ def registerShift(empID, frameCount):
             tempPic = person[-1]
             person.remove(person[-1])
             person.insert(1, tempPic)
-            writePhotoNames(photoRegister) # update photoRegister
-            return(tempPic) # returns pic name
+
+             # Update photoRegister and return picture name
+            writePhotoNames(photoRegister)
+            return(tempPic)

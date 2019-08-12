@@ -25,7 +25,7 @@ Greeter Guru is a "proof of concept" application designed, developed, and deploy
 
 Execute first part of installation - make sure that you're in the GreeterGuru directory
 ```bash
-$ sudo bin/install-1.sh
+$ bin/install-1.sh
 ```
 
 Manually create and enter virtual environment - after this, (cv) should always be displayed before username
@@ -35,25 +35,31 @@ $ source ~/.profile && mkvirtualenv cv -p python3
 
 Execute second part of installation - there is a prompt at the beginning, and then you can leave it to finish executing, which will take around 60 minutes
 ```bash
-$ sudo bin/install-2.sh
+$ bin/install-2.sh
 ```
 
 NOTE: To uninstall OpenCV and the virtual environment run the following command - this may be necessary if the installation process fails partway through
 ```bash
-$ sudo bin/uninstall.sh
+$ bin/uninstall.sh
 ```
 
 
 ## How to Use
 
-Set up Active Directory and Web Server
+Set up connection to active directory
 ```bash
-$ sudo bin/setup.sh
+$ sudo sed -i '/TLS_REQCERT never/d' /etc/ldap/ldap.conf
+$ sudo echo "TLS_REQCERT never" >> /etc/ldap/ldap.conf
 ```
 
-Run the application
+Initialize active directory and web server information
 ```bash
-$ python3 GreeterGuru.py
+$ bin/setup.sh
+```
+
+Run the application - you will have to enter the web admin's password
+```bash
+$ python3 launch.py
 ```
 
 

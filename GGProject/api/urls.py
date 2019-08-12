@@ -10,6 +10,5 @@ urlpatterns = [
     path('pictures/', views.ListPictures.as_view(), name="allpictures"),
     path('pictures/<int:emp_ID>/', views.EmployeePictures.as_view()),
     path('pictures/<str:name>/', views.SinglePicture.as_view()),
-    path('temp-photos/', views.ListTempPhotos.as_view(), name="alltempphotos"),
     path('token-auth/', authviews.obtain_auth_token),
 ]

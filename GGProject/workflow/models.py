@@ -120,38 +120,6 @@ class Picture(models.Model):
         return("{}".format(self.name))
 
 
-# Photos belonging to unknown individuals
-class TempPhoto(models.Model):
-
-    # Information about the entire class
-    class Meta:
-        verbose_name = "Unknown Photo"
-
-    # Temporary ID for a stored photo
-    temp_id = models.AutoField(
-        max_length = 100,
-        primary_key = True,
-        verbose_name ="Temporary ID"
-    )
-
-    # Actual image file, stored in GreeterGuru/FaceID/TempPhotos
-    unknown_photo = models.ImageField(
-        upload_to = "TempPhotos/",
-        null = True
-    )
-
-    # Shorthand name of the picture
-    name = models.CharField(
-        null = True,
-        unique = True,
-        max_length = 30
-    )
-
-    # Printing a temporary photo outputs its shorthand name
-    def __str__(self):
-        return("{}".format(self.name))
-
-
 # Automatically make every superuser database only
 @receiver(pre_save, sender=settings.AUTH_USER_MODEL)
 def make_database_only(sender, instance=None, created=False, **kwargs):
@@ -195,7 +163,7 @@ def remove_picture(sender, instance=None, created=False, **kwargs):
    # Retrieve lines and move cursor to start of file
    lines = f.readlines()
    f.seek(0)
-   
+
    for line in lines:
        # If picture is in current line, remove it then write the line
        # Otherwise, just write the line as is

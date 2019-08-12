@@ -32,7 +32,6 @@ def handleKeyPress(key):
     # Add the pressed key to the code sequence when
     # input is being accepted
     if acceptInput and key != "#":
-        print(key)
         code += key
 
     # Stop accepting input when the end key is pressed
@@ -158,7 +157,6 @@ def getEmpID(url, headers, mylcd):
         return -1
     # Retrieve and verify keycode if valid ID was input
     elif response:
-        print("getKeycode")
         return getKeycode(response, mylcd)
     # Display that there were too many failed attempts and return error value
     else:
@@ -171,8 +169,6 @@ def getEmpID(url, headers, mylcd):
 
 # Handles when a detected face is not recognized
 def validateEmployee(url, headers):
-
-    print("Unrecognized Face")
 
     # Variable used to update screen display
     mylcd = I2C_LCD_driver.lcd()
