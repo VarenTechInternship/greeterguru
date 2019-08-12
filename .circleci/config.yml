@@ -15,12 +15,13 @@ jobs:
       - checkout
       # - restore_cache: # ensure this step occurs *before* install dependencies
       #    key: deps10-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-      - run: 
+      - run:
           command: | # use pipenv to install dependencies
             sudo apt-get install -y python-dev libldap2-dev libsasl2-dev libssl-dev
             source venv/bin/activate
             sudo python -m pip install -r requirements.txt
             cd GGProject
+            export GGPATH=$PWD
             python manage.py makemigrations
             python manage.py migrate
             python manage.py test
