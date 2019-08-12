@@ -36,6 +36,25 @@ sed -i "s/WEB_USERNAME = .*/WEB_USERNAME = \"$web_user\"/" GGProject/GreeterGuru
 # Initialize automatic updates
 bin/update.sh
 
+# Initialize Slack API
+read -r -p "Would you like to integrate a Slack doorbell feature: y or n? " update
+if [ "$update" = "y" ]
+then
+    # Create daily update with crontab
+    sed -i "0 0 * * * python3 $GGPATH/FaceID/removeSlackChannel.py sync_command" bin/base_crontab_file
+    echo "0 0 * * * python3 $GGPATH/FaceID/removeSlackChannel.py sync_command" >> bin/base_crontab_file
+
+    # Write Slack info to settings.py
+    echo "Initialize your Slack Application"
+    read -r -p "Slack Token: " slack_token
+    read -r -p "Slack Channel ID: e.g. CM09B52LW" slack_channel
+    read -r -p "Slack Channel Name: e.g. doorbell" slack_channel_name
+    sed -i "s/SLACK_TOKEN = .*/SLACK_TOKEN = \"$slack_token\"/" GGProject/GreeterGuru/settings.py
+    sed -i "s/SLACK_CHANNEL = .*/SLACK_CHANNEL = \"$slack_channel\"/" GGProject/GreeterGuru/settings.py
+    sed -i "s/SLACK_CHANNEL_NAME = .*/SLACK_CHANNEL_NAME = \"$slack_channel_name\"/" GGProject/GreeterGuru/settings.py
+fi
+crontab bin/base_crontab_file
+
 sudo sed -i "s/AD_NAME = .*/AD_NAME = \"$ad_name\"/" GGProject/GreeterGuru/settings.py
 sudo sed -i "s/AD_USERNAME = .*/AD_USERNAME = \"$ad_user\"/" GGProject/GreeterGuru/settings.py
 sudo sed -i "s/AD_PASSWORD = .*/AD_PASSWORD = \"$ad_pass1\"/" GGProject/GreeterGuru/settings.py

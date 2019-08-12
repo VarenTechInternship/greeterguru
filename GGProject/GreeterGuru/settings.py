@@ -17,7 +17,7 @@ from django_auth_ldap.config import LDAPSearch, NestedActiveDirectoryGroupType
 
 # Address and URL for the website
 WEB_ADDRESS = "localhost:8000"
-WEB_URL = "https://" + WEB_ADDRESS + "/"
+WEB_URL = "http://" + WEB_ADDRESS + "/"
 
 # Username for the admin user on website
 WEB_USERNAME = "admin"
@@ -35,6 +35,11 @@ AD_ADDRESS = "ldaps://" + AD_NAME + ":636"
 # Whether TLS should be used
 # Always false until TLS certificate is retrieved and implemented
 USE_TLS = True
+
+# Slack setup
+SLACK_TOKEN = ""
+SLACK_CHANNEL = ""
+SLACK_CHANNEL_NAME = ""
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.join(os.environ["GGPATH"], "GGProject")

@@ -19,7 +19,8 @@ Execute second part of installation - there is a prompt at the beginning, and th
 ```bash
 $ bin/install-2.sh
 ```
-Set up Active Directory and Web Server automatically
+
+Set up Active Directory and Web Server automatically. If utilizing Slack API, follow Slack Instructions below before running setup.sh
 ```bash
 $ bin/setup.sh
 ```
@@ -62,6 +63,21 @@ For password hash issues, remove sqlite database file before resetting migration
 ```bash
 $ rm -f tmp.db db.sqlite3
 ```
+
+## OPTIONAL: Set up Slack API Doorbell Feature
+If not using Slack, skip ahead to 'Set up Active Directory and Web Server Automatically'
+1. Create a Slack Application at:
+https://api.slack.com/apps?new_app=1
+2. Create App Token:
+https://api.slack.com/custom-integrations/legacy-tokens
+ Legacy Tokens > Legacy Information > Legacy Token Generator > My Workspace > Create Token
+ Copy your Legacy token onto a text editor of your choice to be used in setup.sh as a Slack Token
+3. Create a Channel:
+ Channels > Add > Create Channel.
+ Copy channel name - including # for public channels - into your text editor to be used in setup.sh as the Slack Channel Name.
+4. Get Channel ID:
+![Schematics](webaddress.png)
+ Copy the second section of ID text starting with "C..." into your text editor to be used in setup.sh as your Slack Channel ID.
 
 ## Directories Overview
 

@@ -10,6 +10,7 @@ import numpy as np
 from PIL import Image
 from django.core.files import File
 from gpiozero import MotionSensor
+from slackclient import SlackClient
 
 # Add web app directory to path so its constants can be referenced
 sys.path.append(os.path.join(os.environ["GGPATH"], "GGProject"))
@@ -207,6 +208,7 @@ def detectFace(url, headers, frameCount):
                 if lock == True:
                     print("UNLOCKED")
                     lock = False
+                    slackPost(EmpID, url, headers)
 
                 for person in photoRegister:
                     extractEmpID = person[1].split("_")[0]
@@ -270,6 +272,31 @@ def senseMotion(pir, url, headers, frameCount):
         pir.wait_for_motion()
         detectFace(url, headers, frameCount)
 
+# Add employee to Slack Doorbell channel
+def slackPost(empID, url, headers):
+    slack_token = settings.SLACK_TOKEN
+    slack_channel = settings.SLACK_CHANNEL
+    slack_channel_name = settings.SLACK_CHANNEL_NAME
+
+    if slack_token is not "" and slack_channel is not "":
+        response = req.get(url + "employees/" + str(empID) + "/", headers=headers)
+        first_name = response.json()["first_name"]
+        varen_email = response.json()["email"]
+
+        #time = datetime.now().strftime("%H:M:%S")
+        #text = "[" + time + "] Welcome " + "first_name" + "!"
+        slack_client = SlackClient(slack_token)
+        try:
+            unarchive = slack_client.api_call("channels.unarchive", json = {
+            'channel': slack_channel,
+            'token': slack_token
+            })
+        except:
+            pass
+        api_call = slack_client.api_call("channels.join", json = {
+        'channel':slack_channel,
+        'name': slack_channel_name,
+        })
 
 # Will be replaced with proximity sensor control loop
 def main():
@@ -296,9 +323,8 @@ def main():
 
     # Load PIR motion sensor
     pir = MotionSensor(4)
-
+    
     print("GreeterGuru : FaceID Functionality testing\n\n")
-
     action = 0
     while (action != -1):
 
