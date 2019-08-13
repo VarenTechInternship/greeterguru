@@ -82,7 +82,7 @@ def getKeycode(response, mylcd):
         mylcd.lcd_display_string("keycode", 2, 4)
 
         # Allow keycode to be entered and determine whether the input timed out
-        timeOut = getInput(10)
+        timeOut = getInput(20)
         enteredKeycode = code
         code = ""
         mylcd.lcd_clear()
@@ -134,7 +134,7 @@ def getEmpID(url, headers, mylcd):
         mylcd.lcd_display_string("employee ID", 2, 2)
 
         # Allow emp_ID to be entered and determine whether the input timed out
-        timeOut = getInput(10)
+        timeOut = getInput(20)
         enteredID = code
         code = ""
         mylcd.lcd_clear()

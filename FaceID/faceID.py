@@ -3,6 +3,7 @@ import os
 import sys
 import io
 import time
+import getpass
 from datetime import datetime
 import requests as req
 import json
@@ -63,17 +64,32 @@ def trainDataset():
         print("\nNo Registered Employees!\n")
 
 
-# Initializes a new employee
-def initializeEmployee(empID, url, frameCount, headers):
+# checks if employee's face data exists
+def employeeExist(empID, photoRegister):
 
+    for person in photoRegister:
+        extractEmpID = person[1].split("_")[0]
+        if (int(extractEmpID) == empID):
+            return(True)
+        else: 
+            return(False)
+
+
+# Initializes a new employee
+def initializeEmployee(empID, url, headers, cam):
+
+    print("Initializing Face")
     photoRegister = mpd.readPhotoNames()
     photoNum = 0
     person = [':']
+    frameCount = 20
 
     # Initialize camera
-    cam = cv2.VideoCapture(0)
-    cam.set(3, 640) # width
-    cam.set(4, 480) # height
+    #cam = cv2.VideoCapture(0)
+    #cam.set(3, 640) # width
+    #cam.set(4, 480) # height
+
+    print("ping1")
 
     while(True):
 
@@ -85,6 +101,7 @@ def initializeEmployee(empID, url, frameCount, headers):
         detector = cv2.CascadeClassifier("Cascades/haarcascade_frontalface_default.xml")
         faces = detector.detectMultiScale(gray, 1.3, 5)
 
+        print("ping2")
         # Add given number of detected faces to database/photoRegister
         for (x,y,w,h) in faces:
 
@@ -126,10 +143,9 @@ def initializeEmployee(empID, url, frameCount, headers):
 
 
 # Detects and identifies registered employee faces
-def detectFace(url, headers, frameCount):
+def detectFace(url, headers):
 
     photoRegister = mpd.readPhotoNames()
-    updateFrameCount = 5
 
     if len(photoRegister) == 0:
         print("\nNo Registered Employees!\n")
@@ -160,6 +176,7 @@ def detectFace(url, headers, frameCount):
     lock = True
     camWait = 10 # camera timeout limit in seconds
     timeStamp = time.time()
+    
 
     # Within camera timeout limit
     while (np.abs(int((time.time() - timeStamp))) < camWait):
@@ -222,10 +239,10 @@ def detectFace(url, headers, frameCount):
 
                             print("UPDATING . . .")
                             # Update employee's photos
-                            for i in range(updateFrameCount):
+                            for i in range(5):
 
                                 # Shift photo names
-                                photoName = mpd.registerShift(EmpID, frameCount)
+                                photoName = mpd.registerShift(EmpID, 5)
                                 response = req.delete(url + "pictures/" + photoName + "/") # delete current photo
 
                                 # Convert captured frame to bytes/file object
@@ -243,13 +260,44 @@ def detectFace(url, headers, frameCount):
                             # Log last face scan time
                             mpd.recordLastScan(EmpID)
 
+
             # Accuracy does not pass threshold
-            elif (avgAccuracy <= accThreshold):
+            elif (avgAccuracy <= 10) and (avgAccuracy > 0):
+
                 # Run once when locked
                 if lock == False:
                     print("LOCKED")
                     lock = True
-                    employee = validateEmployee(url, headers)
+
+                employee = validateEmployee(url, headers)
+
+                if employee != -1:
+                    empExist = employeeExist(employee, photoRegister)
+                    if not empExist:
+                        initializeEmployee(employee, url, headers, cam)
+                    else:
+                        print("UPDATING . . .")
+                        # Update employee's photos
+                        for i in range(10):
+
+                            # Shift photo names
+                            photoName = mpd.registerShift(employee, 10)
+                            response = req.delete(url + "pictures/" + photoName + "/") # delete current photo
+
+                            # Convert captured frame to bytes/file object
+                            image = Image.fromarray(gray[y:y+h,x:x+w])
+                            imageFile = io.BytesIO()
+                            image.save(imageFile, "JPEG")
+                            imageFile.seek(0)
+
+                            # Post the picture to the proper Employee in the database
+                            imageFile.name = photoName  + ".jpg"
+                            files = {"file" : imageFile}
+                            if photoName != "none":
+                                response = req.post(url + "pictures/" + str(employee) + "/", files=files, headers=headers) # add newly captured photo
+
+                        # Log last face scan time
+                        mpd.recordLastScan(employee)
 
         # Press 'ESC' for exiting video
         k = cv2.waitKey(10) & 0xff
@@ -263,12 +311,12 @@ def detectFace(url, headers, frameCount):
 
 
 # Continuously checks PIR sensor for motion
-def senseMotion(pir, url, headers, frameCount):
+def senseMotion(pir, url, headers):
 
     # Halt program until motion is detected, then detect faces
     while True:
         pir.wait_for_motion()
-        detectFace(url, headers, frameCount)
+        detectFace(url, headers)
 
 
 # Will be replaced with proximity sensor control loop
@@ -276,17 +324,13 @@ def main():
 
     # Stores photo names for each person as a 2D list
     photoRegister = []
-    # Amount of frames to take and maintain for an employee
-    frameCount = 20
-    # Amount of frames to capture and update to a recognized/verified employee
-    updateFrameCount = 5
 
     # Website's API url
     url = settings.WEB_URL + "api/"
 
     # Retrieve website's admin's credentials for authentication
-    username = "admin" # settings.WEB_USERNAME
-    password = "V@r3nTech#" #getpass.getpass("Web admin's password: ")
+    username = settings.WEB_USERNAME
+    password = getpass.getpass("Web admin's password: ")
     data = {"username": username, "password": password}
 
     # Create authorization header for authenticating HTTP requests
@@ -297,29 +341,7 @@ def main():
     # Load PIR motion sensor
     pir = MotionSensor(4)
 
-    print("GreeterGuru : FaceID Functionality testing\n\n")
+    print("~ GreeterGuru ~\n\n")
 
-    action = 0
-    while (action != -1):
+    senseMotion(pir, url, headers)
 
-        # Test action menu
-        print("1. Register new employee\n",
-            "2. detectFace() \n",
-            "3. Run proximity sensor\n"
-            "[-1] to QUIT\n")
-
-        action = int(input("Select an action: "))
-
-        if action == 1:
-            initializeEmployee(100, url, frameCount, headers)
-        elif action == 2:
-            trainDataset()
-            detectFace(url, headers, frameCount)
-        elif action == 3:
-            senseMotion(pir, url, headers, frameCount)
-        elif action == -1:
-            print("Exiting Program")
-        else:
-            print("\nEnter correct value\n")
-
-main()
