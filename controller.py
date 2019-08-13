@@ -17,8 +17,6 @@ if __name__ == '__main__':
     proc2 = multiprocessing.Process(target=faceRecog)
 
     proc1.start()
-
     time.sleep(5)
-
     proc2.start()
 
