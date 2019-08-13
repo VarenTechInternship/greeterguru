@@ -17,7 +17,7 @@ from django_auth_ldap.config import LDAPSearch, NestedActiveDirectoryGroupType
 
 # Address and URL for the website
 WEB_ADDRESS = "localhost:8000"
-WEB_URL = "https://" + WEB_ADDRESS + "/"
+WEB_URL = "http://" + WEB_ADDRESS + "/"
 
 # Username for the admin user on website
 WEB_USERNAME = "admin"
