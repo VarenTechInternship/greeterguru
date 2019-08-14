@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
-from workflow.models import Employee, Picture, TempPhoto
-from .serializers import EmployeesSerializer, PicturesSerializer, TempPhotosSerializer
+from workflow.models import Employee, Picture
+from .serializers import EmployeesSerializer, PicturesSerializer
 from django.contrib.auth.models import User
 
 
@@ -45,7 +45,7 @@ class SingleEmployeeID(APIView):
 
 # API for handling a single employee based on their username
 class SingleEmployeeName(APIView):
-    
+
     permission_classes = authen
 
     # Retrieve employee according to passed employee ID
@@ -60,14 +60,14 @@ class SingleEmployeeName(APIView):
         employee = self.get_employee(username)
         serializer = EmployeesSerializer(employee)
         return Response(serializer.data)
-        
+
     # Delete retrieved employee
     def delete(self, request, username, format=None):
         employee = self.get_employee(username)
         employee.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    
+
 # API for handling all pictures
 class ListPictures(APIView):
 
@@ -136,34 +136,4 @@ class SinglePicture(APIView):
     def delete(self, request, name):
         picture = self.get_picture(name)
         picture.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
-# API for handling all temporary photos
-class ListTempPhotos(APIView):
-
-    permission_classes = authen
-
-    # Return all temporary photos
-    def get(self, request):
-        tempPhotos = TempPhoto.objects.all()
-        serializer = TempPhotosSerializer(tempPhotos, many=True)
-        return Response(serializer.data)
-
-    # Create and add new temporary photo
-    def post(self, request):
-        serializer = TempPhotosSerializer(data={})
-        if serializer.is_valid():
-            # Add all necessary attributes
-            serializer.validated_data["unknown_photo"] = request.FILES['file']
-            pic_name = request.FILES['file'].name.split(".")[0]
-            serializer.validated_data["name"] = pic_name
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # Delete all temporary photos
-    def delete(self, request):
-        TempPhoto.objects.all().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

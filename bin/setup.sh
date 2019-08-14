@@ -18,9 +18,6 @@ while [ "$ad_pass1" != "$ad_pass2" ]; do
     echo
 done
 
-sudo sed -i '/TLS_REQCERT never/d' /etc/ldap/ldap.conf
-sudo echo "TLS_REQCERT never" >> /etc/ldap/ldap.conf
-
 echo "
 INITIALIZE WEB DATABASE"
 python3 GGProject/manage.py makemigrations

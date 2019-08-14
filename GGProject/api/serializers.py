@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from workflow.models import Employee, Picture, TempPhoto
+from workflow.models import Employee, Picture
 
 
 # Serializer for the Employee class
@@ -20,22 +20,12 @@ class EmployeesSerializer(serializers.ModelSerializer):
             "database_only",
         )
 
-# Serializer for the picture class
+# Serializer for the Picture class
 class PicturesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Picture
         fields = (
             'employee',
             'picture',
-            'name',
-        )
-
-# Serializer for the temporary photo class
-class TempPhotosSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TempPhoto
-        fields = (
-            'temp_id',
-            'unknown_photo',
             'name',
         )

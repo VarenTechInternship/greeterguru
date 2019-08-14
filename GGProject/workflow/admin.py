@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
-from .models import Employee, Picture, TempPhoto, Token
+from .models import Employee, Picture, Token
 from .forms import EmployeeForm
 
 
@@ -43,4 +43,3 @@ admin.site.unregister(Token)
 # Register create models
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Picture)
-admin.site.register(TempPhoto)

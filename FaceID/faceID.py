@@ -30,7 +30,7 @@ def trainDataset():
 
         path = 'dataset'
         recognizer = cv2.face.LBPHFaceRecognizer_create()
-        detector = cv2.CascadeClassifier("Cascades/haarcascade_frontalface_default.xml")
+        detector = cv2.CascadeClassifier("cascades/haarcascade_frontalface_default.xml")
 
         def getImagesAndLabels(path):
 
@@ -47,21 +47,16 @@ def trainDataset():
                     id = int(picName.split("_")[0])
                     PIL_img = Image.open(imagePath).convert('L')
                     img_numpy = np.array(PIL_img,'uint8')
-                    print(id)
+
                     faces = detector.detectMultiScale(img_numpy)
                     for (x,y,w,h) in faces:
                         faceSamples.append(img_numpy[y:y+h,x:x+w])
                         ids.append(id)
             return faceSamples,ids
 
-        print ("\n [INFO] Training faces . . .")
         faces,ids = getImagesAndLabels(path)
         recognizer.train(faces, np.array(ids))
         recognizer.write('trainer/trainer.yml')
-        print("\n Training complete !")
-
-    else:
-        print("\nNo Registered Employees!\n")
 
 
 # checks if employee's face data exists
@@ -71,25 +66,17 @@ def employeeExist(empID, photoRegister):
         extractEmpID = person[1].split("_")[0]
         if (int(extractEmpID) == empID):
             return(True)
-        else: 
+        else:
             return(False)
 
 
 # Initializes a new employee
 def initializeEmployee(empID, url, headers, cam):
 
-    print("Initializing Face")
     photoRegister = mpd.readPhotoNames()
     photoNum = 0
     person = [':']
     frameCount = 20
-
-    # Initialize camera
-    #cam = cv2.VideoCapture(0)
-    #cam.set(3, 640) # width
-    #cam.set(4, 480) # height
-
-    print("ping1")
 
     while(True):
 
@@ -98,10 +85,9 @@ def initializeEmployee(empID, url, headers, cam):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # Detect faces
-        detector = cv2.CascadeClassifier("Cascades/haarcascade_frontalface_default.xml")
+        detector = cv2.CascadeClassifier("cascades/haarcascade_frontalface_default.xml")
         faces = detector.detectMultiScale(gray, 1.3, 5)
 
-        print("ping2")
         # Add given number of detected faces to database/photoRegister
         for (x,y,w,h) in faces:
 
@@ -125,10 +111,7 @@ def initializeEmployee(empID, url, headers, cam):
         # Exit after adding given number of pictures
         # or by manually exiting with wait key (esc)
         k = cv2.waitKey(100) & 0xff # Press 'ESC' for exiting video
-        if k == 27:
-            break
-        elif photoNum >= frameCount:
-            print("\nFacial Scan Complete!\n")
+        if k == 27 or photoNum >= frameCount:
             break
 
     # Disconnect camera
@@ -148,13 +131,12 @@ def detectFace(url, headers):
     photoRegister = mpd.readPhotoNames()
 
     if len(photoRegister) == 0:
-        print("\nNo Registered Employees!\n")
         pass
 
     # Facial recognition and detection tools
     recognizer = cv2.face.LBPHFaceRecognizer_create()
     recognizer.read('trainer/trainer.yml')
-    cascadePath = "Cascades/haarcascade_frontalface_default.xml"
+    cascadePath = "cascades/haarcascade_frontalface_default.xml"
     faceCascade = cv2.CascadeClassifier(cascadePath);
     font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -166,8 +148,6 @@ def detectFace(url, headers):
     minW = 0.1*cam.get(3)
     minH = 0.1*cam.get(4)
 
-    print("Press 'ESC' key to exit\n")
-
     # Initialize variables
     count = 0
     accuracyList = []
@@ -176,7 +156,7 @@ def detectFace(url, headers):
     lock = True
     camWait = 10 # camera timeout limit in seconds
     timeStamp = time.time()
-    
+
 
     # Within camera timeout limit
     while (np.abs(int((time.time() - timeStamp))) < camWait):
@@ -222,7 +202,6 @@ def detectFace(url, headers):
 
                 # Run once when unlocked
                 if lock == True:
-                    print("UNLOCKED")
                     lock = False
 
                 for person in photoRegister:
@@ -237,7 +216,6 @@ def detectFace(url, headers):
                         # If employee hasn't entered in the past day
                         if lastScan != currentDate:
 
-                            print("UPDATING . . .")
                             # Update employee's photos
                             for i in range(5):
 
@@ -266,7 +244,6 @@ def detectFace(url, headers):
 
                 # Run once when locked
                 if lock == False:
-                    print("LOCKED")
                     lock = True
 
                 employee = validateEmployee(url, headers)
@@ -276,7 +253,6 @@ def detectFace(url, headers):
                     if not empExist:
                         initializeEmployee(employee, url, headers, cam)
                     else:
-                        print("UPDATING . . .")
                         # Update employee's photos
                         for i in range(10):
 
@@ -341,7 +317,4 @@ def main():
     # Load PIR motion sensor
     pir = MotionSensor(4)
 
-    print("~ GreeterGuru ~\n\n")
-
     senseMotion(pir, url, headers)
-
