@@ -13,7 +13,7 @@ django-popupcrud==0.8.0
 django-pure-pagination==0.3.0
 django-rest-auth==0.9.5
 django-tests==1.8.3
-djangorestframework==3.9.4
+djangorestframework==3.11.2
 gpiozero==1.5.1
 idna==2.8
 linecache2==1.0.0
